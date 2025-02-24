@@ -1,21 +1,184 @@
-import { ChatClient, ChatError } from '@easemob/chatsdk';
+import { ChatClient, ChatError, ConnectionListener,
+  ConversationType,
+  MultiDevicesEvent, MultiDevicesListener } from '@easemob/chatsdk';
 import { FlutterPluginBinding, MethodCall, MethodResult } from '@ohos/flutter_ohos';
+import ChatManagerWrapper from './ChatManagerWrapper';
+import ChatRoomManagerWrapper from './ChatRoomManagerWrapper';
+import ChatThreadManagerWrapper from './ChatThreadManagerWrapper';
+import ContactManagerWrapper from './ContactManagerWrapper';
+import ConversationWrapper from './ConversationWrapper';
+import GroupManagerWrapper from './GroupManagerWrapper';
+import MessageWrapper from './MessageWrapper';
 import MethodKey from './MethodKeys';
 import ChatOptionsHelper from './models/ChatOptionsHelper';
+import PresenceManagerWrapper from './PresenceManagerWrapper';
+import ProgressManager from './ProgressManager';
+import PushManagerWrapper from './PushManagerWrapper';
+import UserInfoManagerWrapper from './UserInfoManagerWrapper';
 import Wrapper from './Wrapper';
+import { HashMap } from '@kit.ArkTS';
+import LoginExtensionInfoHelper from './models/LoginExtensionInfoHelper';
 
 export default class ClientWrapper extends Wrapper {
+
+  private chatManager: ChatManagerWrapper | undefined;
+  private groupManager: GroupManagerWrapper | undefined;
+  private roomManager: ChatRoomManagerWrapper | undefined;
+  private pushManager: PushManagerWrapper | undefined;
+  private presenceManager: PresenceManagerWrapper | undefined;
+  private threadManager: ChatThreadManagerWrapper | undefined;
+  private contactManager: ContactManagerWrapper | undefined;
+  private userInfoManager: UserInfoManagerWrapper | undefined;
+  private conversationManager: ConversationWrapper | undefined;
+  private messageWrapper: MessageWrapper | undefined;
+  private progressManager: ProgressManager | undefined;
+  private multiDeviceListener: MultiDevicesListener | undefined;
+  private connectionListener: ConnectionListener | undefined;
 
 
   constructor(binding: FlutterPluginBinding, channelName: string) {
     super(binding, channelName);
   }
 
-
   public sendDataToFlutter(data: Map<string, Object>) {
     if(data != null) {
       this.channel?.invokeMethod(MethodKey.onSendDataToFlutter, data);
     }
+  }
+
+  bindingManagers() {
+    this.chatManager = new ChatManagerWrapper(this.binding!, "chat_manager");
+    this.contactManager = new ContactManagerWrapper(this.binding!, "chat_contact_manager");
+    this.roomManager = new ChatRoomManagerWrapper(this.binding!, "chat_room_manager");
+    this.groupManager = new GroupManagerWrapper(this.binding!, "chat_group_manager");
+    this.groupManager.clientWrapper = this;
+    this.conversationManager = new ConversationWrapper(this.binding!, "chat_conversation");
+    this.pushManager = new PushManagerWrapper(this.binding!, "chat_push_manager");
+    this.userInfoManager = new UserInfoManagerWrapper(this.binding!, "chat_userInfo_manager");
+    this.presenceManager = new PresenceManagerWrapper(this.binding!, "chat_presence_manager");
+    this.messageWrapper = new MessageWrapper(this.binding!, "chat_message");
+    this.threadManager = new ChatThreadManagerWrapper(this.binding!, "chat_thread_manager");
+    this.progressManager = new ProgressManager(this.binding!, "file_progress_manager");
+  }
+
+  public unRegisterEaseListener() {
+    this.chatManager?.unRegisterEaseListener();
+    this.contactManager?.unRegisterEaseListener();
+    this.roomManager?.unRegisterEaseListener();
+    this.groupManager?.unRegisterEaseListener();
+    if(this.groupManager != null) {
+      this.groupManager!.clientWrapper = null;
+    }
+    this.conversationManager?.unRegisterEaseListener();
+    this.pushManager?.unRegisterEaseListener();
+    this.userInfoManager?.unRegisterEaseListener();
+    this.presenceManager?.unRegisterEaseListener();
+    this.messageWrapper?.unRegisterEaseListener();
+    this.threadManager?.unRegisterEaseListener();
+    this.progressManager?.unRegisterEaseListener();
+  }
+
+  registerEaseListener() {
+    let weakRef = new WeakRef(this);
+    if(this.multiDeviceListener != null) {
+      ChatClient.getInstance().removeMultiDevicesListener(this.multiDeviceListener);
+    }
+
+    this.multiDeviceListener = {
+      onContactEvent(event, target, ext): void {
+        let retrievedObject = weakRef.deref();
+        let data = new HashMap<string, Object>();
+        data.set("event", event);
+        data.set("target", target);
+        data.set("ext", ext);
+        retrievedObject?.channel?.invokeMethod(MethodKey.onMultiDeviceContactEvent, data);
+      },
+      onGroupEvent(event,  target, userIds) {
+        let retrievedObject = weakRef.deref();
+        let data = new HashMap<string, Object>();
+        data.set("event", event);
+        data.set("target", target);
+        data.set("users", userIds);
+        retrievedObject?.channel?.invokeMethod(MethodKey.onMultiDeviceGroupEvent, data);
+      },
+      onMessageRemoved(conversationId, deviceId) {
+        let retrievedObject = weakRef.deref();
+        let data = new HashMap<string, Object>();
+        data.set("convId", conversationId);
+        data.set("deviceId", deviceId);
+        retrievedObject?.channel?.invokeMethod(MethodKey.onMultiDeviceRemoveMessagesEvent, data);
+      },
+      onConversationEvent(event, conversationId, type) {
+        let retrievedObject = weakRef.deref();
+        let data = new HashMap<string, Object>();
+        data.set("event", event);
+        data.set("convId", conversationId);
+        data.set("type", type);
+        retrievedObject?.channel?.invokeMethod(MethodKey.onMultiDevicesConversationEvent, data);
+      }
+    };
+
+    ChatClient.getInstance().addMultiDevicesListener(this.multiDeviceListener);
+
+    if (this.connectionListener != null) {
+      ChatClient.getInstance().removeConnectionListener(this.connectionListener);
+    }
+
+    this.connectionListener = {
+      onConnected() {
+        let retrievedObject = weakRef.deref();
+        let data = new HashMap<string, Object>();
+        data.set("connected", true);
+        retrievedObject?.channel?.invokeMethod(MethodKey.onConnected, data);
+      },
+      onDisconnected(errCode) {
+        let retrievedObject = weakRef.deref();
+        let data = new HashMap<string, Object>();
+        if(errCode == 206) {
+          // 这部分实现放到onLogout中。
+        }else if (errCode == 207) {
+          retrievedObject?.channel?.invokeMethod(MethodKey.onConnected, data);
+        }else if (errCode == 305) {
+          retrievedObject?.channel?.invokeMethod(MethodKey.onUserDidForbidByServer, data);
+        }else if (errCode == 216) {
+          retrievedObject?.channel?.invokeMethod(MethodKey.onUserDidChangePassword, data);
+        }else if (errCode == 214) {
+          retrievedObject?.channel?.invokeMethod(MethodKey.onUserDidLoginTooManyDevice, data);
+        }else if (errCode == 217) {
+          retrievedObject?.channel?.invokeMethod(MethodKey.onUserKickedByOtherDevice, data);
+        }else if (errCode == 202) {
+          retrievedObject?.channel?.invokeMethod(MethodKey.onUserAuthenticationFailed, data);
+        }else if (errCode == 8) {
+          retrievedObject?.channel?.invokeMethod(MethodKey.onAppActiveNumberReachLimit, data);
+        }else {
+          retrievedObject?.channel?.invokeMethod(MethodKey.onDisconnected, data);
+        }
+      },
+      onTokenExpired(){
+        let retrievedObject = weakRef.deref();
+        retrievedObject?.channel?.invokeMethod(MethodKey.onTokenDidExpire, null);
+      },
+      onTokenWillExpire() {
+        let retrievedObject = weakRef.deref();
+        retrievedObject?.channel?.invokeMethod(MethodKey.onTokenWillExpire, null);
+      },
+      onLogout(errorCode, loginInfo) {
+        let retrievedObject = weakRef.deref();
+        if (errorCode == 206) {
+          retrievedObject?.channel?.invokeMethod(MethodKey.onTokenWillExpire, LoginExtensionInfoHelper.toJson(loginInfo));
+        }
+      },
+      onOfflineMessageSyncStart() {
+        let retrievedObject = weakRef.deref();
+        retrievedObject?.channel?.invokeMethod(MethodKey.onOfflineMessageSyncStart, null);
+      },
+      onOfflineMessageSyncFinish() {
+        let retrievedObject = weakRef.deref();
+        retrievedObject?.channel?.invokeMethod(MethodKey.onOfflineMessageSyncFinish, null);
+      }
+    }
+
+    ChatClient.getInstance().addConnectionListener(this.connectionListener);
   }
 
   onMethodCall(call: MethodCall, result: MethodResult): void {
@@ -133,6 +296,9 @@ export default class ClientWrapper extends Wrapper {
   private init(call: MethodCall, result: MethodResult) {
       let options = ChatOptionsHelper.fromJson(call.args as Map<string, Object>);
       ChatClient.getInstance().init(this.context, options);
+
+      this.bindingManagers();
+      this.registerEaseListener();
       this.onSuccess(result, call.method);
   }
 

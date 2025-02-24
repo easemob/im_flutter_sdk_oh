@@ -8,9 +8,9 @@ import ChatErrorHelper from "./models/ChatErrorHelper";
 
 export default class Wrapper implements  MethodCallHandler{
 
-  public context: common.Context  | null = null;
-  public binding: FlutterPluginBinding | null = null;
-  public channel: MethodChannel | null = null;
+  public context: common.Context  | undefined;
+  public binding: FlutterPluginBinding | undefined;
+  public channel: MethodChannel | undefined;
 
   constructor(binding: FlutterPluginBinding, channelName: string) {
     this.context = binding.getApplicationContext();
@@ -33,8 +33,9 @@ export default class Wrapper implements  MethodCallHandler{
     result.success(map);
   }
 
+  public unRegisterEaseListener() {}
 
-  onMethodCall(call: MethodCall, result: MethodResult): void {
+  onMethodCall(_: MethodCall, result: MethodResult): void {
     result.notImplemented();
   }
 }
