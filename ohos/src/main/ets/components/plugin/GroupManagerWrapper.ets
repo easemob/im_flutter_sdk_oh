@@ -1,8 +1,7 @@
 import { ChatClient,
-  ChatError,
-  GroupListener,
+  ChatError, Group, GroupListener, SharedFile,
  } from "@easemob/chatsdk";
-import { FlutterPluginBinding, JSONMethodCodec,
+import { FlutterPluginBinding,
   MethodCall,
   MethodCallHandler,
   MethodResult } from "@ohos/flutter_ohos";
@@ -26,6 +25,227 @@ export default class GroupManagerWrapper extends Wrapper implements MethodCallHa
   registerEaseListener() {
     this.unRegisterEaseListener();
     let weakRef = new WeakRef(this);
+    this.listener = {
+      onWhitelistAdded(groupId, whitelist) {
+        let retrievedObject = weakRef.deref();
+        let data = new Map<string, Object>();
+        data.set("type", "onGroupWhiteListAdded");
+        data.set("groupId", groupId);
+        data.set("whitelist", whitelist);
+        retrievedObject?.channel?.invokeMethod(MethodKey.onGroupChanged, data);
+      },
+      onWhitelistRemoved(groupId, whitelist) {
+        let retrievedObject = weakRef.deref();
+        let data = new Map<string, Object>();
+        data.set("type", "onGroupWhiteListRemoved");
+        data.set("groupId", groupId);
+        data.set("whitelist", whitelist);
+        retrievedObject?.channel?.invokeMethod(MethodKey.onGroupChanged, data);
+      },
+      onAllMemberMuteStateChanged(groupId, isMuted) {
+        let retrievedObject = weakRef.deref();
+        let data = new Map<string, Object>();
+        data.set("type", "onGroupAllMemberMuteStateChanged");
+        data.set("groupId", groupId);
+        data.set("isMuted", isMuted);
+        retrievedObject?.channel?.invokeMethod(MethodKey.onGroupChanged, data);
+      },
+      onInvitationReceived(groupId, groupName, inviter, reason){
+        let retrievedObject = weakRef.deref();
+        let data = new Map<string, Object>();
+        data.set("type", "onGroupInvitationReceived");
+        data.set("groupId", groupId);
+        data.set("groupName", groupName);
+        data.set("inviter", inviter);
+        data.set("reason", reason);
+        retrievedObject?.channel?.invokeMethod(MethodKey.onGroupChanged, data);
+      },
+      onRequestToJoinReceived(groupId: string, groupName: string, applicant: string, reason: string) {
+        let retrievedObject = weakRef.deref();
+        let data = new Map<string, Object>();
+        data.set("type", "onGroupRequestToJoinReceived");
+        data.set("groupId", groupId);
+        data.set("groupName", groupName);
+        data.set("applicant", applicant);
+        data.set("reason", reason);
+        retrievedObject?.channel?.invokeMethod(MethodKey.onGroupChanged, data);
+      },
+      onRequestToJoinAccepted(groupId: string, groupName: string, accepter: string){
+        let retrievedObject = weakRef.deref();
+        let data = new Map<string, Object>();
+        data.set("type", "onGroupRequestToJoinAccepted");
+        data.set("groupId", groupId);
+        data.set("groupName", groupName);
+        data.set("accepter", accepter);
+        retrievedObject?.channel?.invokeMethod(MethodKey.onGroupChanged, data);
+      },
+      onRequestToJoinDeclined(groupId: string, _: string, decliner: string, applicant: string, reason: string) {
+        let retrievedObject = weakRef.deref();
+        let data = new Map<string, Object>();
+        data.set("type", "onGroupRequestToJoinDeclined");
+        data.set("groupId", groupId);
+        data.set("applicant", applicant);
+        data.set("decliner", decliner);
+        data.set("reason", reason);
+        retrievedObject?.channel?.invokeMethod(MethodKey.onGroupChanged, data);
+      },
+      onInvitationAccepted(groupId: string, invitee: string, reason: string) {
+        let retrievedObject = weakRef.deref();
+        let data = new Map<string, Object>();
+        data.set("type", "onGroupInvitationAccepted");
+        data.set("groupId", groupId);
+        data.set("invitee", invitee);
+        data.set("reason", reason);
+        retrievedObject?.channel?.invokeMethod(MethodKey.onGroupChanged, data);
+      },
+      onInvitationDeclined(groupId: string, invitee: string, reason: string){
+        let retrievedObject = weakRef.deref();
+        let data = new Map<string, Object>();
+        data.set("type", "onGroupInvitationDeclined");
+        data.set("groupId", groupId);
+        data.set("invitee", invitee);
+        data.set("reason", reason);
+        retrievedObject?.channel?.invokeMethod(MethodKey.onGroupChanged, data);
+      },
+      onUserRemoved(groupId: string, groupName: string) {
+        let retrievedObject = weakRef.deref();
+        let data = new Map<string, Object>();
+        data.set("type", "onGroupUserRemoved");
+        data.set("groupId", groupId);
+        data.set("groupName", groupName);
+        retrievedObject?.channel?.invokeMethod(MethodKey.onGroupChanged, data);
+      },
+      onGroupDestroyed(groupId: string, groupName: string) {
+        let retrievedObject = weakRef.deref();
+        let data = new Map<string, Object>();
+        data.set("type", "onGroupDestroyed");
+        data.set("groupId", groupId);
+        data.set("groupName", groupName);
+        retrievedObject?.channel?.invokeMethod(MethodKey.onGroupChanged, data);
+      },
+      onAutoAcceptInvitationFromGroup(groupId: string, inviter: string, inviteMessage: string) {
+        let retrievedObject = weakRef.deref();
+        let data = new Map<string, Object>();
+        data.set("type", "onGroupAutoAcceptInvitation");
+        data.set("groupId", groupId);
+        data.set("inviter", inviter);
+        data.set("inviteMessage", inviteMessage);
+        retrievedObject?.channel?.invokeMethod(MethodKey.onGroupChanged, data);
+      },
+      onMutelistAdded(groupId: string, mutes: string[], muteExpire: number) {
+        let retrievedObject = weakRef.deref();
+        let data = new Map<string, Object>();
+        data.set("type", "onGroupMuteListAdded");
+        data.set("groupId", groupId);
+        data.set("mutes", mutes);
+        data.set("muteExpire", muteExpire);
+        retrievedObject?.channel?.invokeMethod(MethodKey.onGroupChanged, data);
+      },
+      onMutelistRemoved(groupId: string, mutes: string[]) {
+        let retrievedObject = weakRef.deref();
+        let data = new Map<string, Object>();
+        data.set("type", "onGroupMuteListRemoved");
+        data.set("groupId", groupId);
+        data.set("mutes", mutes);
+        retrievedObject?.channel?.invokeMethod(MethodKey.onGroupChanged, data);
+      },
+      onAdminAdded(groupId: string, administrator: string) {
+        let retrievedObject = weakRef.deref();
+        let data = new Map<string, Object>();
+        data.set("type", "onGroupAdminAdded");
+        data.set("groupId", groupId);
+        data.set("administrator", administrator);
+        retrievedObject?.channel?.invokeMethod(MethodKey.onGroupChanged, data);
+      },
+      onAdminRemoved(groupId: string, administrator: string) {
+        let retrievedObject = weakRef.deref();
+        let data = new Map<string, Object>();
+        data.set("type", "onGroupAdminRemoved");
+        data.set("groupId", groupId);
+        data.set("administrator", administrator);
+        retrievedObject?.channel?.invokeMethod(MethodKey.onGroupChanged, data);
+      },
+      onOwnerChanged(groupId: string, newOwner: string, oldOwner: string) {
+        let retrievedObject = weakRef.deref();
+        let data = new Map<string, Object>();
+        data.set("type", "onGroupOwnerChanged");
+        data.set("groupId", groupId);
+        data.set("newOwner", newOwner);
+        data.set("oldOwner", oldOwner);
+        retrievedObject?.channel?.invokeMethod(MethodKey.onGroupChanged, data);
+      },
+      onMemberJoined(groupId: string, member: string) {
+        let retrievedObject = weakRef.deref();
+        let data = new Map<string, Object>();
+        data.set("type", "onGroupMemberJoined");
+        data.set("groupId", groupId);
+        data.set("member", member);
+        retrievedObject?.channel?.invokeMethod(MethodKey.onGroupChanged, data);
+      },
+      onMemberExited(groupId: string, member: string) {
+        let retrievedObject = weakRef.deref();
+        let data = new Map<string, Object>();
+        data.set("type", "onGroupMemberExited");
+        data.set("groupId", groupId);
+        data.set("member", member);
+        retrievedObject?.channel?.invokeMethod(MethodKey.onGroupChanged, data);
+      },
+      onAnnouncementChanged(groupId: string, announcement: string) {
+        let retrievedObject = weakRef.deref();
+        let data = new Map<string, Object>();
+        data.set("type", "onGroupAnnouncementChanged");
+        data.set("groupId", groupId);
+        data.set("announcement", announcement);
+        retrievedObject?.channel?.invokeMethod(MethodKey.onGroupChanged, data);
+      },
+      onSharedFileAdded(groupId: string, sharedFile: SharedFile) {
+        let retrievedObject = weakRef.deref();
+        let data = new Map<string, Object>();
+        data.set("type", "onGroupSharedFileAdded");
+        data.set("groupId", groupId);
+        data.set("sharedFile", SharedFileHelper.toJson(sharedFile));
+        retrievedObject?.channel?.invokeMethod(MethodKey.onGroupChanged, data);
+      },
+      onSharedFileDeleted(groupId: string, fileId: string) {
+        let retrievedObject = weakRef.deref();
+        let data = new Map<string, Object>();
+        data.set("type", "onGroupSharedFileDeleted");
+        data.set("groupId", groupId);
+        data.set("fileId", fileId);
+        retrievedObject?.channel?.invokeMethod(MethodKey.onGroupChanged, data);
+      },
+      onSpecificationChanged(group) {
+        let retrievedObject = weakRef.deref();
+        let data = new Map<string, Object>();
+        data.set("type", "onGroupSpecificationDidUpdate");
+        data.set("group", GroupHelper.toJson(group));
+        retrievedObject?.channel?.invokeMethod(MethodKey.onGroupChanged, data);
+      },
+      onStateChanged(group: Group, isDisabled: boolean) {
+        let retrievedObject = weakRef.deref();
+        let data = new Map<string, Object>();
+        data.set("type", "onGroupStateChanged");
+        data.set("groupId", group.groupId());
+        data.set("isDisabled", isDisabled);
+        retrievedObject?.channel?.invokeMethod(MethodKey.onGroupChanged, data);
+      },
+      onGroupMemberAttributeChanged(groupId: string, member: string, attributes: Map<string, string>, from: string) {
+        let retrievedObject = weakRef.deref();
+        let data = new Map<string, Object>();
+        data.set("type", "onGroupAttributesChangedOfMember");
+        data.set("groupId", groupId);
+        data.set("userId", member);
+        if (from != null) {
+          data.set("operatorId", from);
+        }
+        if (attributes != null) {
+          data.set("attributes", attributes);
+        }
+        retrievedObject?.channel?.invokeMethod(MethodKey.onGroupChanged, data);
+      },
+    }
+
+    ChatClient.getInstance().groupManager()?.addListener(this.listener);
   }
 
   unRegisterEaseListener() {
@@ -190,7 +410,7 @@ export default class GroupManagerWrapper extends Wrapper implements MethodCallHa
       .catch((e: ChatError) => this.onError(result, e));
   }
 
-  private getGroupSpecificationFromServer(call: MethodCall, result: MethodResult) {
+  private getGroupSpecificationFromServer(_: MethodCall, result: MethodResult) {
     this.noSupport(result);
   }
   private getGroupMemberListFromServer(call: MethodCall, result: MethodResult) {
