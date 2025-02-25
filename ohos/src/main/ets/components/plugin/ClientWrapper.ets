@@ -16,7 +16,6 @@ import ProgressManager from './ProgressManager';
 import PushManagerWrapper from './PushManagerWrapper';
 import UserInfoManagerWrapper from './UserInfoManagerWrapper';
 import Wrapper from './Wrapper';
-import { HashMap } from '@kit.ArkTS';
 import LoginExtensionInfoHelper from './models/LoginExtensionInfoHelper';
 
 export default class ClientWrapper extends Wrapper {
@@ -31,7 +30,7 @@ export default class ClientWrapper extends Wrapper {
   private userInfoManager: UserInfoManagerWrapper | undefined;
   private conversationManager: ConversationWrapper | undefined;
   private messageWrapper: MessageWrapper | undefined;
-  private progressManager: ProgressManager | undefined;
+  public  progressManager: ProgressManager | undefined;
   private multiDeviceListener: MultiDevicesListener | undefined;
   private connectionListener: ConnectionListener | undefined;
 
@@ -76,6 +75,9 @@ export default class ClientWrapper extends Wrapper {
     this.messageWrapper?.unRegisterEaseListener();
     this.threadManager?.unRegisterEaseListener();
     this.progressManager?.unRegisterEaseListener();
+
+    ChatClient.getInstance().removeMultiDevicesListener(this.multiDeviceListener);
+    ChatClient.getInstance().removeConnectionListener(this.connectionListener);
   }
 
   registerEaseListener() {
@@ -87,7 +89,7 @@ export default class ClientWrapper extends Wrapper {
     this.multiDeviceListener = {
       onContactEvent(event, target, ext): void {
         let retrievedObject = weakRef.deref();
-        let data = new HashMap<string, Object>();
+        let data = new Map<string, Object>();
         data.set("event", event);
         data.set("target", target);
         data.set("ext", ext);
@@ -95,7 +97,7 @@ export default class ClientWrapper extends Wrapper {
       },
       onGroupEvent(event,  target, userIds) {
         let retrievedObject = weakRef.deref();
-        let data = new HashMap<string, Object>();
+        let data = new Map<string, Object>();
         data.set("event", event);
         data.set("target", target);
         data.set("users", userIds);
@@ -103,14 +105,14 @@ export default class ClientWrapper extends Wrapper {
       },
       onMessageRemoved(conversationId, deviceId) {
         let retrievedObject = weakRef.deref();
-        let data = new HashMap<string, Object>();
+        let data = new Map<string, Object>();
         data.set("convId", conversationId);
         data.set("deviceId", deviceId);
         retrievedObject?.channel?.invokeMethod(MethodKey.onMultiDeviceRemoveMessagesEvent, data);
       },
       onConversationEvent(event, conversationId, type) {
         let retrievedObject = weakRef.deref();
-        let data = new HashMap<string, Object>();
+        let data = new Map<string, Object>();
         data.set("event", event);
         data.set("convId", conversationId);
         data.set("type", type);
@@ -127,13 +129,13 @@ export default class ClientWrapper extends Wrapper {
     this.connectionListener = {
       onConnected() {
         let retrievedObject = weakRef.deref();
-        let data = new HashMap<string, Object>();
+        let data = new Map<string, Object>();
         data.set("connected", true);
         retrievedObject?.channel?.invokeMethod(MethodKey.onConnected, data);
       },
       onDisconnected(errCode) {
         let retrievedObject = weakRef.deref();
-        let data = new HashMap<string, Object>();
+        let data = new Map<string, Object>();
         if(errCode == 206) {
           // 这部分实现放到onLogout中。
         }else if (errCode == 207) {
@@ -349,19 +351,19 @@ export default class ClientWrapper extends Wrapper {
   }
 
   private compressLogs(_: MethodCall, result: MethodResult) {
-    result.notImplemented();
+    this.noSupport(result);
   }
 
   private getLoggedInDevicesFromServer(_: MethodCall, result: MethodResult) {
-    result.notImplemented();
+    this.noSupport(result);
   }
 
   private kickDevice(_: MethodCall, result: MethodResult) {
-    result.notImplemented();
+    this.noSupport(result);
   }
 
   private kickAllDevices(_: MethodCall, result: MethodResult) {
-    result.notImplemented();
+    this.noSupport(result);
   }
 
   private isLoggedInBefore(call: MethodCall, result: MethodResult) {
@@ -486,7 +488,7 @@ export default class ClientWrapper extends Wrapper {
   }
 
   private updateRegradeMessagesSetting(_: MethodCall, result: MethodResult) {
-    result.notImplemented();
+    this.noSupport(result);
   }
 
   private changeAppId(call: MethodCall, result: MethodResult) {

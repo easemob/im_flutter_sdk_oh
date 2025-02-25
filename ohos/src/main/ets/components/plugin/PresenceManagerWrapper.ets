@@ -1,5 +1,5 @@
-import { ChatMessageListener, ChatroomListener, ConversationListener, PresenceListener } from "@easemob/chatsdk";
-import { FlutterPluginBinding, JSONMethodCodec, MethodCallHandler, MethodChannel } from "@ohos/flutter_ohos";
+import { PresenceListener } from "@easemob/chatsdk";
+import { FlutterPluginBinding, MethodCallHandler } from "@ohos/flutter_ohos";
 import Wrapper from "./Wrapper";
 
 export default class PresenceManagerWrapper extends Wrapper implements MethodCallHandler {

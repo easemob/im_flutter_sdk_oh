@@ -8,4 +8,11 @@ export default class ChatErrorHelper {
     ret.set("description", err.description);
     return ret;
   }
+
+  static infoToJson(code: number, desc: string): Map<string, object> {
+    let ret = new Map<string, Object>();
+    ret.set("code", code);
+    ret.set("description", desc);
+    return ret;
+  }
 }
