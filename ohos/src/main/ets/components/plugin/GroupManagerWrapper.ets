@@ -394,7 +394,7 @@ export default class GroupManagerWrapper extends Wrapper implements MethodCallHa
   private getPublicGroupsFromServer(call: MethodCall, result: MethodResult) {
     let pageSize = call.argument("pageSize") as number;
     let cursor: string | null = null;
-    if(typeof call.hasArgument("cursor")) {
+    if(call.hasArgument("cursor")) {
       cursor = call.argument("cursor");
     }
 
@@ -416,7 +416,7 @@ export default class GroupManagerWrapper extends Wrapper implements MethodCallHa
   private getGroupMemberListFromServer(call: MethodCall, result: MethodResult) {
     let groupId = call.argument("groupId") as string;
     let cursor: string | undefined;
-    if(typeof call.hasArgument("cursor")) {
+    if(call.hasArgument("cursor")) {
       cursor = call.argument("cursor");
     }
     let pageSize = call.argument("pageSize") as number;
@@ -472,7 +472,7 @@ export default class GroupManagerWrapper extends Wrapper implements MethodCallHa
     let groupId = call.argument("groupId") as string;
     let members = call.argument("members") as Array<string>;
     let welcome: string | undefined;
-    if(typeof call.hasArgument("welcome")) {
+    if(call.hasArgument("welcome")) {
       welcome = call.argument("welcome");
     }
     ChatClient.getInstance().groupManager()?.addUsersToGroup(groupId, members, welcome)
@@ -484,7 +484,7 @@ export default class GroupManagerWrapper extends Wrapper implements MethodCallHa
     let groupId = call.argument("groupId") as string;
     let members = call.argument("members") as Array<string>;
     let reason: string | undefined;
-    if(typeof call.hasArgument("reason")) {
+    if(call.hasArgument("reason")) {
       reason = call.argument("reason");
     }
     ChatClient.getInstance().groupManager()?.inviteUsers(groupId, members, reason)

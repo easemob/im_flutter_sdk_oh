@@ -111,7 +111,7 @@ export default class ContactManagerWrapper extends Wrapper implements MethodCall
   private addContact(call: MethodCall, result: MethodResult) {
     let userId = call.argument("username") as string;
     let reason: string | null = null;
-    if(typeof call.hasArgument("reason")) {
+    if(call.hasArgument("reason")) {
       reason = call.argument("reason");
     }
     ChatClient.getInstance().contactManager()?.addContact(userId, reason)
@@ -204,7 +204,7 @@ export default class ContactManagerWrapper extends Wrapper implements MethodCall
   private fetchContacts(call: MethodCall, result: MethodResult) {
     let pageSize = call.argument("pageSize") as number;
     let cursor: string | null = null;
-    if(typeof call.hasArgument("cursor")) {
+    if(call.hasArgument("cursor")) {
         cursor = call.argument("cursor");
     }
 
