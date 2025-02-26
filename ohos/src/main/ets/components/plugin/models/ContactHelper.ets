@@ -1,13 +1,11 @@
 import { Contact } from "@easemob/chatsdk";
+import { SafetyValue } from "../SafetyMapTool";
 
 export default class ContactHelper {
   static toJson(contact: Contact): Map<string, Object> {
     let ret = new Map<string, Object>();
-    ret.set("userId", contact.userId());
-    let remark = contact.remark();
-    if(remark != null) {
-      ret.set("remark", remark);
-    }
+    SafetyValue(contact.userId(), (value)=>ret.set("userId", value));
+    SafetyValue(contact.remark(), (value)=>ret.set("remark", value));
     return ret;
   }
 

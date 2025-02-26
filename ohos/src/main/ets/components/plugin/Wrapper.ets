@@ -1,5 +1,4 @@
 import {
-  Any,
   FlutterPluginBinding, MethodCall, MethodCallHandler, MethodChannel, MethodResult } from "@ohos/flutter_ohos";
 import { common } from "@kit.AbilityKit";
 import { ChatError } from "@easemob/chatsdk";
@@ -20,9 +19,9 @@ export default class Wrapper implements  MethodCallHandler{
   }
 
 
-  public onSuccess(result: MethodResult, method: string, object?: Object): void {
+  public onSuccess(result: MethodResult, method: string, object?: Object | null): void {
     let map = new Map<string, Object>();
-    if(object != null) {
+    if(object) {
       map.set(method, object);
     }
     result.success(map);

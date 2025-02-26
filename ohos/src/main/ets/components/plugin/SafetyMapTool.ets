@@ -1,14 +1,16 @@
 import { Any } from "@ohos/flutter_ohos";
 
-export type StringCallback = (obj: Object) => void;
+export type StringCallback<T> = (obj: T) => void;
 
-export function SafetyValue(value: Object, func: StringCallback) {
-  if (value !== null) {
+export function SafetyValue<T>(value: T, func: StringCallback<T>, defaultValue?: T) {
+  if (value) {
     func(value);
+  }else if(defaultValue) {
+    func(defaultValue);
   }
 }
 
-export function GetSafetyValue<T>(map: Map<string, Any>, key:string, defaultValue?: T): T | undefined {
+export function GetSafetyValue<T>(map: Map<string, Object>, key:string, defaultValue?: T): T | undefined {
   if(map.has(key))
   {
     return map.get(key) as T;

@@ -1,9 +1,37 @@
-import { ChatClient, ChatMessageListener, ConversationListener } from "@easemob/chatsdk";
+import { ChatClient,
+  ChatMessage,
+  ChatMessageListener, ConversationListener,
+  ConversationType,
+  DownloadStatus,
+  MessageStatus,
+  ContentType,
+  FileMessageBody,
+  VoiceMessageBody,
+  ImageMessageBody,
+  VideoMessageBody,
+  ChatError,
+  FetchMessageOption,
+  SearchDirection,
+  ChatType,
+  FetchReactionDetailParams,
+} from "@easemob/chatsdk";
 import { FlutterPluginBinding, JSONMethodCodec,
   MethodCall,
   MethodCallHandler, MethodChannel,
   MethodResult } from "@ohos/flutter_ohos";
+import ConversationFilterHelper from "./ConversationFilterHelper";
+import EnumTool from "./EnumTool";
+import FetchMessageOptionHelper from "./FetchMessageOptionHelper";
+import HelpTool from "./HelpTool";
 import MethodKey from "./MethodKeys";
+import ChatErrorHelper from "./models/ChatErrorHelper";
+import ChatMessageReactionHelper from "./models/ChatMessageReactionHelper";
+import ConversationHelper from "./models/ConversationHelper";
+import CursorResultHelper from "./models/CursorResultHelper";
+import GroupReadAckHelper from "./models/GroupReadAckHelper";
+import MessageBodyHelper from "./models/MessageBodyHelper";
+import MessageHelper from "./models/MessageHelper";
+import { GetSafetyValue, SafetyValue } from "./SafetyMapTool";
 import Wrapper from "./Wrapper";
 
 export default class ChatManagerWrapper extends Wrapper implements MethodCallHandler {
@@ -29,6 +57,46 @@ export default class ChatManagerWrapper extends Wrapper implements MethodCallHan
     if(this.conversationListener != null) {
       ChatClient.getInstance().chatManager()?.removeConversationListener(this.conversationListener);
     }
+  }
+
+  updateDownloadStatus(downloadStatus: DownloadStatus, msg: ChatMessage, isThumbnail: boolean): Map<string, Object> {
+    let canUpdate = false;
+    switch (msg.getType()) {
+      case ContentType.FILE:
+      case ContentType.VOICE:
+        if(isThumbnail) break;
+      case ContentType.IMAGE:
+      case ContentType.VIDEO:
+        canUpdate = true;
+        break;
+      default :
+        break;
+    }
+    if(canUpdate) {
+      let body = msg.getBody();
+      if(msg.getType() == ContentType.FILE) {
+        let tmpBody = body as FileMessageBody;
+        tmpBody.setDownloadStatus(downloadStatus);
+      } else if (msg.getType() == ContentType.VOICE) {
+        let tmpBody = body as VoiceMessageBody;
+        tmpBody.setDownloadStatus(downloadStatus);
+      } else if (msg.getType() == ContentType.IMAGE) {
+        let tmpBody = body as ImageMessageBody;
+        if(isThumbnail) {
+          tmpBody.setThumbnailDownloadStatus(downloadStatus);
+        }else {
+          tmpBody.setDownloadStatus(downloadStatus);
+        }
+      } else if (msg.getType() == ContentType.VIDEO) {
+        let tmpBody = body as VideoMessageBody;
+        if(isThumbnail) {
+          tmpBody.setThumbnailDownloadStatus(downloadStatus);
+        }else {
+          tmpBody.setDownloadStatus(downloadStatus);
+        }
+      }
+    }
+    return MessageHelper.toJson(msg)!;
   }
 
   onMethodCall(call: MethodCall, result: MethodResult): void {
@@ -136,54 +204,497 @@ export default class ChatManagerWrapper extends Wrapper implements MethodCallHan
       super.onMethodCall(call, result);
     }
   }
-  private sendMessage(call: MethodCall, result: MethodResult) {}
-  private resendMessage(call: MethodCall, result: MethodResult) {}
-  private ackMessageRead(call: MethodCall, result: MethodResult) {}
-  private ackGroupMessageRead(call: MethodCall, result: MethodResult) {}
-  private ackConversationRead(call: MethodCall, result: MethodResult) {}
-  private recallMessage(call: MethodCall, result: MethodResult) {}
-  private getConversation(call: MethodCall, result: MethodResult) {}
-  private getThreadConversation(call: MethodCall, result: MethodResult) {}
-  private markAllChatMsgAsRead(call: MethodCall, result: MethodResult) {}
-  private getUnreadMessageCount(call: MethodCall, result: MethodResult) {}
-  private updateChatMessage(call: MethodCall, result: MethodResult) {}
-  private downloadAttachment(call: MethodCall, result: MethodResult) {}
-  private downloadThumbnail(call: MethodCall, result: MethodResult) {}
-  private downloadMessageAttachmentInCombine(call: MethodCall, result: MethodResult) {}
-  private downloadMessageThumbnailInCombine(call: MethodCall, result: MethodResult) {}
-  private importMessages(call: MethodCall, result: MethodResult) {}
-  private loadAllConversations(call: MethodCall, result: MethodResult) {}
-  private getConversationsFromServer(call: MethodCall, result: MethodResult) {}
-  private deleteConversation(call: MethodCall, result: MethodResult) {}
-  private fetchHistoryMessages(call: MethodCall, result: MethodResult) {}
-  private fetchHistoryMessagesByOptions(call: MethodCall, result: MethodResult) {}
-  private searchChatMsgFromDB(call: MethodCall, result: MethodResult) {}
-  private getMessage(call: MethodCall, result: MethodResult) {}
-  private asyncFetchGroupMessageAckFromServer(call: MethodCall, result: MethodResult) {}
-  private deleteRemoteConversation(call: MethodCall, result: MethodResult) {}
-  private deleteMessagesBefore(call: MethodCall, result: MethodResult) {}
-  private translateMessage(call: MethodCall, result: MethodResult) {}
-  private fetchSupportedLanguages(call: MethodCall, result: MethodResult) {}
-  private addReaction(call: MethodCall, result: MethodResult) {}
-  private removeReaction(call: MethodCall, result: MethodResult) {}
-  private fetchReactionList(call: MethodCall, result: MethodResult) {}
-  private fetchReactionDetail(call: MethodCall, result: MethodResult) {}
-  private reportMessage(call: MethodCall, result: MethodResult) {}
-  private getConversationsFromServerWithPage(call: MethodCall, result: MethodResult) {}
-  private removeMessagesFromServerWithMsgIds(call: MethodCall, result: MethodResult) {}
-  private removeMessagesFromServerWithTs(call: MethodCall, result: MethodResult) {}
-  private getConversationsFromServerWithCursor(call: MethodCall, result: MethodResult) {}
-  private getPinnedConversationsFromServerWithCursor(call: MethodCall, result: MethodResult) {}
-  private pinConversation(call: MethodCall, result: MethodResult) {}
-  private modifyMessage(call: MethodCall, result: MethodResult) {}
-  private downloadAndParseCombineMessage(call: MethodCall, result: MethodResult) {}
-  private addRemoteAndLocalConversationsMark(call: MethodCall, result: MethodResult) {}
-  private deleteRemoteAndLocalConversationsMark(call: MethodCall, result: MethodResult) {}
-  private fetchConversationsByOptions(call: MethodCall, result: MethodResult) {}
-  private deleteAllMessageAndConversation(call: MethodCall, result: MethodResult) {}
-  private pinMessage(call: MethodCall, result: MethodResult) {}
-  private unpinMessage(call: MethodCall, result: MethodResult) {}
-  private fetchPinnedMessages(call: MethodCall, result: MethodResult) {}
-  private searchMsgByOptions(call: MethodCall, result: MethodResult) {}
-  private getMessageCount(call: MethodCall, result: MethodResult) {}
+  private sendMessage(call: MethodCall, result: MethodResult) {
+    let msg = MessageHelper.fromJson(call.args);
+    let localMsgID = msg.getMsgId();
+    let weakRef = new WeakRef(this);
+    msg.setMessageStatusCallback({
+      onSuccess() {
+        let retrievedObject = weakRef.deref();
+        let data = new Map<string, Object>();
+        data.set("localId", localMsgID);
+        data.set("message", MessageHelper.toJson(msg));
+        retrievedObject?.messageChannel.invokeMethod(MethodKey.onMessageSuccess, data);
+      },
+      onProgress(progress) {
+        let retrievedObject = weakRef.deref();
+        let data = new Map<string, Object>();
+        data.set("localId", localMsgID);
+        data.set("progress", progress);
+        retrievedObject?.messageChannel.invokeMethod(MethodKey.onMessageProgressUpdate, data);
+      },
+      onError(code, desc) {
+        let retrievedObject = weakRef.deref();
+        let data = new Map<string, Object>();
+        data.set("localId", localMsgID);
+        data.set("message", MessageHelper.toJson(msg));
+        data.set("error", ChatErrorHelper.infoToJson(code, desc));
+        retrievedObject?.messageChannel.invokeMethod(MethodKey.onMessageSuccess, data);
+      }
+    });
+
+    ChatClient.getInstance().chatManager()?.sendMessage(msg);
+    this.onSuccess(result, call.method);
+  }
+  private resendMessage(call: MethodCall, result: MethodResult) {
+    let tempMsg = MessageHelper.fromJson(call.args);
+    let weakRef = new WeakRef(this);
+    let msg = ChatClient.getInstance().chatManager()?.getMessage(tempMsg.getMsgId());
+    if(msg == null) {
+      msg = tempMsg;
+    }
+    let localMsgID = msg.getMsgId();
+    msg.setStatus(MessageStatus.CREATE);
+
+    msg.setMessageStatusCallback({
+      onSuccess() {
+        let retrievedObject = weakRef.deref();
+        let data = new Map<string, Object>();
+        data.set("localId", localMsgID);
+        data.set("message", MessageHelper.toJson(msg));
+        retrievedObject?.messageChannel.invokeMethod(MethodKey.onMessageSuccess, data);
+      },
+      onProgress(progress) {
+        let retrievedObject = weakRef.deref();
+        let data = new Map<string, Object>();
+        data.set("localId", localMsgID);
+        data.set("progress", progress);
+        retrievedObject?.messageChannel.invokeMethod(MethodKey.onMessageProgressUpdate, data);
+      },
+      onError(code, desc) {
+        let retrievedObject = weakRef.deref();
+        let data = new Map<string, Object>();
+        data.set("localId", localMsgID);
+        data.set("message", MessageHelper.toJson(msg));
+        data.set("error", ChatErrorHelper.infoToJson(code, desc));
+        retrievedObject?.messageChannel.invokeMethod(MethodKey.onMessageSuccess, data);
+      }
+    });
+    ChatClient.getInstance().chatManager()?.sendMessage(msg);
+    this.onSuccess(result, call.method);
+  }
+
+  private ackMessageRead(call: MethodCall, result: MethodResult) {
+    let msgId = call.argument("msg_id") as string;
+    let to = call.argument("to") as string;
+    ChatClient.getInstance().chatManager()?.ackMessageRead(to, msgId);
+    this.onSuccess(result, call.method);
+  }
+
+  private ackGroupMessageRead(call: MethodCall, result: MethodResult) {
+    let msgId = call.argument("msg_id") as string;
+    let msg = ChatClient.getInstance().chatManager()?.getMessage(msgId);
+    let content = GetSafetyValue(call.args, "content", null);
+    ChatClient.getInstance().chatManager()?.ackGroupMessageRead(msg, content);
+    this.onSuccess(result, call.method);
+  }
+
+  private ackConversationRead(call: MethodCall, result: MethodResult) {
+    let convId = call.argument("convId") as string;
+    ChatClient.getInstance().chatManager()?.ackConversationRead(convId);
+    this.onSuccess(result, call.method);
+  }
+
+  private recallMessage(call: MethodCall, result: MethodResult) {
+    let msgId = call.argument("msg_id") as string;
+    let msg = ChatClient.getInstance().chatManager()?.getMessage(msgId);
+    if(!msg) {
+      this.onErrorInfo(result, 500, "The message was not found");
+      return;
+    }else {
+      ChatClient.getInstance().chatManager()?.recallMessage(msg, GetSafetyValue(call.args, "ext"));
+      this.onSuccess(result, call.method);
+    }
+  }
+
+  private getConversation(call: MethodCall, result: MethodResult) {
+    let convId = call.argument("convId") as string;
+    let createIfNeed = GetSafetyValue(call.args, "createIfNeed", true);
+    let type = GetSafetyValue(call.args, "type", ConversationType.Chat);
+    let conv = ChatClient.getInstance().chatManager()?.getConversation(convId, type, createIfNeed);
+    this.onSuccess(result, call.method, ConversationHelper.toJson(conv));
+  }
+
+  private getThreadConversation(_: MethodCall, result: MethodResult) {
+    this.noSupport(result);
+  }
+
+  private markAllChatMsgAsRead(call: MethodCall, result: MethodResult) {
+    ChatClient.getInstance().chatManager()?.markAllConversationsAsRead();
+    this.onSuccess(result, call.method);
+  }
+
+  private getUnreadMessageCount(_: MethodCall, result: MethodResult) {
+    this.noSupport(result);
+  }
+
+  private updateChatMessage(call: MethodCall, result: MethodResult) {
+    let msg = MessageHelper.fromJson(call.args);
+    let dbMsg = ChatClient.getInstance().chatManager()?.getMessage(msg.getMsgId());
+    if(!dbMsg) {
+      dbMsg = msg;
+    }
+    HelpTool.mergeMessage(msg, dbMsg);
+    ChatClient.getInstance().chatManager()?.updateMessage(dbMsg);
+    this.onSuccess(result, call.method, MessageHelper.toJson(dbMsg));
+  }
+
+  private downloadAttachment(call: MethodCall, result: MethodResult) {
+    let tempMsg = MessageHelper.fromJson(call.args);
+    let dbMsg = ChatClient.getInstance().chatManager()?.getMessage(tempMsg.getMsgId());
+    let weakRef = new WeakRef(this);
+    dbMsg?.setMessageStatusCallback({
+      onSuccess() {
+        let retrievedObject = weakRef.deref();
+        let data = new Map<string, Object>();
+        data.set("localId", dbMsg?.getMsgId());
+        data.set("message", this.updateDownloadStatus(DownloadStatus.SUCCESS, dbMsg, false));
+        retrievedObject?.messageChannel.invokeMethod(MethodKey.onMessageSuccess, data);
+      },
+      onProgress(progress) {
+        let retrievedObject = weakRef.deref();
+        let data = new Map<string, Object>();
+        data.set("localId", dbMsg?.getMsgId);
+        data.set("progress", progress);
+        retrievedObject?.messageChannel.invokeMethod(MethodKey.onMessageProgressUpdate, data);
+      },
+      onError(code, desc) {
+        let retrievedObject = weakRef.deref();
+        let data = new Map<string, Object>();
+        data.set("localId", dbMsg?.getMsgId);
+        data.set("message", this.updateDownloadStatus(DownloadStatus.FAILED, dbMsg, false));
+        data.set("error", ChatErrorHelper.infoToJson(code, desc));
+        retrievedObject?.messageChannel.invokeMethod(MethodKey.onMessageSuccess, data);
+      }
+    });
+    ChatClient.getInstance().chatManager()?.downloadAttachment(dbMsg);
+    this.onSuccess(result, call.method, this.updateDownloadStatus(DownloadStatus.DOWNLOADING, dbMsg!, false));
+  }
+
+  private downloadThumbnail(call: MethodCall, result: MethodResult) {
+    let tempMsg = MessageHelper.fromJson(call.args);
+    let dbMsg = ChatClient.getInstance().chatManager()?.getMessage(tempMsg.getMsgId());
+    let weakRef = new WeakRef(this);
+    dbMsg?.setMessageStatusCallback({
+      onSuccess() {
+        let retrievedObject = weakRef.deref();
+        let data = new Map<string, Object>();
+        data.set("localId", dbMsg?.getMsgId());
+        data.set("message", this.updateDownloadStatus(DownloadStatus.SUCCESS, dbMsg, true));
+        retrievedObject?.messageChannel.invokeMethod(MethodKey.onMessageSuccess, data);
+      },
+      onProgress(progress) {
+        let retrievedObject = weakRef.deref();
+        let data = new Map<string, Object>();
+        data.set("localId", dbMsg?.getMsgId);
+        data.set("progress", progress);
+        retrievedObject?.messageChannel.invokeMethod(MethodKey.onMessageProgressUpdate, data);
+      },
+      onError(code, desc) {
+        let retrievedObject = weakRef.deref();
+        let data = new Map<string, Object>();
+        data.set("localId", dbMsg?.getMsgId);
+        data.set("message", this.updateDownloadStatus(DownloadStatus.FAILED, dbMsg, true));
+        data.set("error", ChatErrorHelper.infoToJson(code, desc));
+        retrievedObject?.messageChannel.invokeMethod(MethodKey.onMessageSuccess, data);
+      }
+    });
+    ChatClient.getInstance().chatManager()?.downloadThumbnail(dbMsg);
+    this.onSuccess(result, call.method, this.updateDownloadStatus(DownloadStatus.DOWNLOADING, dbMsg!, true));
+  }
+
+  private downloadMessageAttachmentInCombine(call: MethodCall, result: MethodResult) {
+    let tempMsg = MessageHelper.fromJson(call.args);
+    let weakRef = new WeakRef(this);
+    tempMsg?.setMessageStatusCallback({
+      onSuccess() {
+        let retrievedObject = weakRef.deref();
+        let data = new Map<string, Object>();
+        data.set("localId", tempMsg?.getMsgId());
+        data.set("message", this.updateDownloadStatus(DownloadStatus.SUCCESS, tempMsg, true));
+        retrievedObject?.messageChannel.invokeMethod(MethodKey.onMessageSuccess, data);
+      },
+      onProgress(progress) {
+        let retrievedObject = weakRef.deref();
+        let data = new Map<string, Object>();
+        data.set("localId", tempMsg?.getMsgId);
+        data.set("progress", progress);
+        retrievedObject?.messageChannel.invokeMethod(MethodKey.onMessageProgressUpdate, data);
+      },
+      onError(code, desc) {
+        let retrievedObject = weakRef.deref();
+        let data = new Map<string, Object>();
+        data.set("localId", tempMsg?.getMsgId);
+        data.set("message", this.updateDownloadStatus(DownloadStatus.FAILED, tempMsg, true));
+        data.set("error", ChatErrorHelper.infoToJson(code, desc));
+        retrievedObject?.messageChannel.invokeMethod(MethodKey.onMessageSuccess, data);
+      }
+    });
+    ChatClient.getInstance().chatManager()?.downloadAttachment(tempMsg);
+    this.onSuccess(result, call.method, this.updateDownloadStatus(DownloadStatus.DOWNLOADING, tempMsg!, false));
+  }
+
+  private downloadMessageThumbnailInCombine(call: MethodCall, result: MethodResult) {
+    let tempMsg = MessageHelper.fromJson(call.args);
+    let weakRef = new WeakRef(this);
+    tempMsg?.setMessageStatusCallback({
+      onSuccess() {
+        let retrievedObject = weakRef.deref();
+        let data = new Map<string, Object>();
+        data.set("localId", tempMsg?.getMsgId());
+        data.set("message", this.updateDownloadStatus(DownloadStatus.SUCCESS, tempMsg, true));
+        retrievedObject?.messageChannel.invokeMethod(MethodKey.onMessageSuccess, data);
+      },
+      onProgress(progress) {
+        let retrievedObject = weakRef.deref();
+        let data = new Map<string, Object>();
+        data.set("localId", tempMsg?.getMsgId);
+        data.set("progress", progress);
+        retrievedObject?.messageChannel.invokeMethod(MethodKey.onMessageProgressUpdate, data);
+      },
+      onError(code, desc) {
+        let retrievedObject = weakRef.deref();
+        let data = new Map<string, Object>();
+        data.set("localId", tempMsg?.getMsgId);
+        data.set("message", this.updateDownloadStatus(DownloadStatus.FAILED, tempMsg, true));
+        data.set("error", ChatErrorHelper.infoToJson(code, desc));
+        retrievedObject?.messageChannel.invokeMethod(MethodKey.onMessageSuccess, data);
+      }
+    });
+    ChatClient.getInstance().chatManager()?.downloadThumbnail(tempMsg);
+    this.onSuccess(result, call.method, this.updateDownloadStatus(DownloadStatus.DOWNLOADING, tempMsg!, true));
+  }
+
+  private importMessages(call: MethodCall, result: MethodResult) {
+    let ary = call.argument("messages") as Array<Map<string, Object>>;
+    let msgs = new Array<ChatMessage>();
+    for (let index = 0; index < ary.length; index++) {
+      const element = ary[index];
+      msgs.push(MessageHelper.fromJson(element));
+    }
+    ChatClient.getInstance().chatManager()?.importMessages(msgs)
+      .then((value)=>this.onSuccess(result, call.method, value))
+      .catch((e: ChatError) => this.onError(result, e));
+  }
+
+  private loadAllConversations(call: MethodCall, result: MethodResult) {
+    let conversations = ChatClient.getInstance().chatManager()?.getAllConversationsBySort();
+    this.onSuccess(result, call.method, ConversationHelper.listToJson(conversations));
+  }
+
+  private getConversationsFromServer(call: MethodCall, result: MethodResult) {
+    this.noSupport(result);
+  }
+
+  private deleteConversation(call: MethodCall, result: MethodResult) {
+    let convId = call.argument("convId") as string;
+    let deleteMessages = call.argument("deleteMessages") as boolean;
+    let succeed = ChatClient.getInstance().chatManager()?.deleteConversation(convId, deleteMessages);
+    this.onSuccess(result, call.method, succeed)
+  }
+
+  private fetchHistoryMessages(call: MethodCall, result: MethodResult) {
+    this.noSupport(result);
+  }
+
+  private fetchHistoryMessagesByOptions(call: MethodCall, result: MethodResult) {
+    let convId = call.argument("convId") as string;
+    let type = EnumTool.conversationTypeFromInt(call.argument("type") as number);
+    let pageSize = call.argument("pageSize") as number;
+    let cursor = GetSafetyValue(call.args, "cursor", null);
+    let options: FetchMessageOption | undefined = FetchMessageOptionHelper.fromJson(GetSafetyValue(call.args, "options"));
+    ChatClient.getInstance().chatManager()?.fetchHistoryMessages(convId,type,pageSize,cursor,options)
+      .then((value)=>this.onSuccess(result, call.method, CursorResultHelper.toJson(value)))
+      .catch((e: ChatError) => this.onError(result, e));
+  }
+
+  private searchChatMsgFromDB(call: MethodCall, result: MethodResult) {
+    let keywords: string| undefined = GetSafetyValue(call.args, "keywords");
+    let timestamp: number| undefined = GetSafetyValue(call.args, "timestamp");
+    let count: number| undefined = GetSafetyValue(call.args, "count");
+    let from: string| undefined = GetSafetyValue(call.args, "from");
+    let direct: SearchDirection| undefined = GetSafetyValue(call.args, "direction");
+
+    ChatClient.getInstance().chatManager()?.searchMessagesFromDB(keywords, timestamp, count, from, direct)
+      .then((value)=>this.onSuccess(result, call.method, MessageHelper.listToJson(value)))
+      .catch((e: ChatError) => this.onError(result, e));
+  }
+
+  private getMessage(call: MethodCall, result: MethodResult) {
+    let msgId: string| undefined = GetSafetyValue(call.args, "msg_id");
+    let msg = ChatClient.getInstance().chatManager()?.getMessage(msgId);
+    this.onSuccess(result, call.method, MessageHelper.toJson(msg));
+  }
+
+  private asyncFetchGroupMessageAckFromServer(call: MethodCall, result: MethodResult) {
+    let msgId: string| undefined = GetSafetyValue(call.args, "msg_id");
+    let ack_id: string| undefined = GetSafetyValue(call.args, "ack_id");
+    let pageSize: number| undefined = GetSafetyValue(call.args, "pageSize");
+    ChatClient.getInstance().chatManager()?.fetchGroupReadAcks(msgId, pageSize, ack_id)
+      .then((value)=>this.onSuccess(result, call.method, CursorResultHelper.toJson(value)))
+      .catch((e: ChatError) => this.onError(result, e));
+  }
+
+  private deleteRemoteConversation(call: MethodCall, result: MethodResult) {
+    let conversationId: string| undefined = GetSafetyValue(call.args, "conversationId");
+    let type = EnumTool.conversationTypeFromInt(call.argument("type") as number);
+    let deleteMessages = call.argument("isDeleteRemoteMessage") as boolean;
+    ChatClient.getInstance().chatManager()?.deleteConversationFromServer(conversationId, type, deleteMessages)
+      .then(()=>this.onSuccess(result, call.method))
+      .catch((e: ChatError) => this.onError(result, e));
+  }
+
+  private deleteMessagesBefore(call: MethodCall, result: MethodResult) {
+    this.noSupport(result);
+  }
+
+  private translateMessage(call: MethodCall, result: MethodResult) {
+    this.noSupport(result);
+  }
+
+  private fetchSupportedLanguages(call: MethodCall, result: MethodResult) {
+    this.noSupport(result);
+  }
+
+  private addReaction(call: MethodCall, result: MethodResult) {
+    let reaction: string| undefined = GetSafetyValue(call.args, "reaction");
+    let msgId: string| undefined = GetSafetyValue(call.args, "msgId");
+    ChatClient.getInstance().chatManager()?.addReaction(msgId, reaction)
+      .then(()=>this.onSuccess(result, call.method))
+      .catch((e: ChatError) => this.onError(result, e));
+  }
+
+  private removeReaction(call: MethodCall, result: MethodResult) {
+    let reaction: string| undefined = GetSafetyValue(call.args, "reaction");
+    let msgId: string| undefined = GetSafetyValue(call.args, "msgId");
+    ChatClient.getInstance().chatManager()?.removeReaction(msgId, reaction)
+      .then(()=>this.onSuccess(result, call.method))
+      .catch((e: ChatError) => this.onError(result, e));
+  }
+
+  private fetchReactionList(call: MethodCall, result: MethodResult) {
+    let msgIds: Array<string> | undefined = GetSafetyValue(call.args, "msgIds");
+    let groupId: string| undefined = GetSafetyValue(call.args, "groupId");
+    let chatType: ChatType | undefined = EnumTool.chatTypeFromInt(GetSafetyValue(call.args, "chatType"));
+    ChatClient.getInstance().chatManager()?.fetchReactions(msgIds, chatType, groupId)
+      .then((value)=>{
+        let data = new Map<string, Object>();
+        value.forEach((v, k)=>{
+            data.set(k, ChatMessageReactionHelper.listToJson(v));
+        });
+        this.onSuccess(result, call.method, data);
+      })
+      .catch((e: ChatError) => this.onError(result, e));
+  }
+  private fetchReactionDetail(call: MethodCall, result: MethodResult) {
+    let params = new FetchReactionDetailParams();
+    params.messageId = GetSafetyValue(call.args, "msgId") ?? "";
+    params.reaction = GetSafetyValue(call.args, "reaction") ?? "";
+    params.cursor = GetSafetyValue(call.args, "cursor");
+    params.pageSize = GetSafetyValue(call.args, "pageSize") ?? 20;
+    ChatClient.getInstance().chatManager()?.fetchReactionDetail(params)
+      .then((value)=>this.onSuccess(result, call.method, CursorResultHelper.toJson(value)))
+      .catch((e: ChatError) => this.onError(result, e));
+  }
+  private reportMessage(call: MethodCall, result: MethodResult) {
+    this.noSupport(result);
+  }
+  private getConversationsFromServerWithPage(call: MethodCall, result: MethodResult) {
+    this.noSupport(result);
+  }
+  private removeMessagesFromServerWithMsgIds(call: MethodCall, result: MethodResult) {
+    ChatClient.getInstance().chatManager()?.removeMessagesFromServer(
+      GetSafetyValue(call.args, "convId"),
+      GetSafetyValue(call.args, "type"),
+      GetSafetyValue(call.args, "msgIds")
+    )
+      .then(()=>this.onSuccess(result, call.method))
+      .catch((e: ChatError) => this.onError(result, e));
+  }
+  private removeMessagesFromServerWithTs(call: MethodCall, result: MethodResult) {
+    this.noSupport(result);
+  }
+  private getConversationsFromServerWithCursor(call: MethodCall, result: MethodResult) {
+    ChatClient.getInstance().chatManager()?.fetchConversationsFromServer(
+      GetSafetyValue(call.args, "pageSize"),
+      GetSafetyValue(call.args, "cursor"),
+    )
+      .then((value)=>this.onSuccess(result, call.method, CursorResultHelper.toJson(value)))
+      .catch((e: ChatError) => this.onError(result, e));
+  }
+  private getPinnedConversationsFromServerWithCursor(call: MethodCall, result: MethodResult) {
+    ChatClient.getInstance().chatManager()?.fetchPinnedConversationsFromServer(
+      GetSafetyValue(call.args, "pageSize"),
+      GetSafetyValue(call.args, "cursor"),
+    )
+      .then((value)=>this.onSuccess(result, call.method, CursorResultHelper.toJson(value)))
+      .catch((e: ChatError) => this.onError(result, e));
+  }
+  private pinConversation(call: MethodCall, result: MethodResult) {
+    ChatClient.getInstance().chatManager()?.pinConversation(
+      GetSafetyValue(call.args, "convId"),
+      GetSafetyValue(call.args, "isPinned") ?? false,
+    )
+      .then(()=>this.onSuccess(result, call.method))
+      .catch((e: ChatError) => this.onError(result, e));
+  }
+  private modifyMessage(call: MethodCall, result: MethodResult) {
+    ChatClient.getInstance().chatManager()?.modifyMessage(
+      GetSafetyValue(call.args, "msgId"),
+      MessageBodyHelper.textBodyFromJson(GetSafetyValue(call.args, "body")!),
+    )
+      .then((value)=>this.onSuccess(result, call.method, MessageHelper.toJson(value)))
+      .catch((e: ChatError) => this.onError(result, e));
+  }
+
+  private downloadAndParseCombineMessage(call: MethodCall, result: MethodResult) {
+    let msg = MessageHelper.fromJson(call.args);
+    ChatClient.getInstance().chatManager()?.downloadAndParseCombineMessage(msg)
+      .then((value)=>this.onSuccess(result, call.method, MessageHelper.listToJson(value)))
+      .catch((e: ChatError) => this.onError(result, e));
+  }
+  private addRemoteAndLocalConversationsMark(call: MethodCall, result: MethodResult) {
+    let convIds: Array<string> = GetSafetyValue(call.args, "convIds")!;
+    let mark: number = GetSafetyValue(call.args, "mark")!;
+    ChatClient.getInstance().chatManager()?.addConversationMark(convIds, mark)
+      .then(()=>this.onSuccess(result, call.method))
+      .catch((e: ChatError) => this.onError(result, e));
+  }
+  private deleteRemoteAndLocalConversationsMark(call: MethodCall, result: MethodResult) {
+    let convIds: Array<string> = GetSafetyValue(call.args, "convIds")!;
+    let mark: number = GetSafetyValue(call.args, "mark")!;
+    ChatClient.getInstance().chatManager()?.removeConversationMark(convIds, mark)
+      .then(()=>this.onSuccess(result, call.method))
+      .catch((e: ChatError) => this.onError(result, e));
+  }
+  private fetchConversationsByOptions(call: MethodCall, result: MethodResult) {
+    ChatClient.getInstance().chatManager()?.fetchConversationsFromServerWithFilter(ConversationFilterHelper.fromJson(call.args))
+      .then((value)=>this.onSuccess(result, call.method, CursorResultHelper.toJson(value)))
+      .catch((e: ChatError) => this.onError(result, e));
+  }
+  private deleteAllMessageAndConversation(call: MethodCall, result: MethodResult) {
+    this.noSupport(result);
+  }
+  private pinMessage(call: MethodCall, result: MethodResult) {
+    ChatClient.getInstance().chatManager()?.pinMessage(GetSafetyValue(call.args, "msgId"))
+      .then(()=>this.onSuccess(result, call.method))
+      .catch((e: ChatError) => this.onError(result, e));
+  }
+  private unpinMessage(call: MethodCall, result: MethodResult) {
+    ChatClient.getInstance().chatManager()?.unpinMessage(GetSafetyValue(call.args, "msgId"))
+      .then(()=>this.onSuccess(result, call.method))
+      .catch((e: ChatError) => this.onError(result, e));
+  }
+  private fetchPinnedMessages(call: MethodCall, result: MethodResult) {
+    ChatClient.getInstance().chatManager()?.fetchPinnedMessagesFromServer(GetSafetyValue(call.args, "convId"))
+      .then((value)=>this.onSuccess(result, call.method, MessageHelper.listToJson(value)))
+      .catch((e: ChatError) => this.onError(result, e));
+  }
+  private searchMsgByOptions(call: MethodCall, result: MethodResult) {
+    this.noSupport(result);
+  }
+  private getMessageCount(call: MethodCall, result: MethodResult) {
+    let count = ChatClient.getInstance().chatManager()?.getDBMsgsCount();
+    this.onSuccess(result, call.method, count);
+  }
 }

@@ -1,11 +1,12 @@
 import { ChatError } from "@easemob/chatsdk";
+import { SafetyValue } from "../SafetyMapTool";
 
 
 export default class ChatErrorHelper {
   static toJson(err: ChatError): Map<string, Object> {
     let ret = new Map<string, Object>();
-    ret.set("code", err.errorCode);
-    ret.set("description", err.description);
+    SafetyValue(err.errorCode, (value)=>ret.set("code", value));
+    SafetyValue(err.description, (value)=>ret.set("description", value));
     return ret;
   }
 
