@@ -12,4 +12,13 @@ export default class GroupReadAckHelper {
     SafetyValue(ack.getContent(), (value)=>ret.set("content", value));
     return ret;
   }
+
+  static listToJson(acks: GroupReadAck[]): Map<string, Object>[] {
+    let list = new Array<Map<string, Object>>();
+    for (let index = 0; index < acks.length; index++) {
+      const ack = acks[index];
+      list.push(GroupReadAckHelper.toJson(ack));
+    }
+    return list;
+  }
 }
