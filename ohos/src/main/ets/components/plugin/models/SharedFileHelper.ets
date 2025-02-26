@@ -4,11 +4,11 @@ import { SafetyValue } from "../SafetyMapTool";
 export default class SharedFileHelper {
   static toJson(file: SharedFile): Map<string, Object> {
     let data = new Map<string, Object>();
-    data.set("fileId", file.fileId());
-    data.set("name", file.fileName());
-    data.set("owner", file.fileOwner());
-    data.set("createTime", file.fileUpdateTime());
-    data.set("fileSize", file.fileSize());
+    SafetyValue(file.fileId(), (value)=>data.set("fileId", value));
+    SafetyValue(file.fileName(), (value)=>data.set("name", value));
+    SafetyValue(file.fileOwner(), (value)=>data.set("owner", value));
+    SafetyValue(file.fileUpdateTime(), (value)=>data.set("createTime", value));
+    SafetyValue(file.fileSize(), (value)=>data.set("fileSize", value));
     return data;
   }
 

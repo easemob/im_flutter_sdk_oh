@@ -218,7 +218,7 @@ export default class GroupManagerWrapper extends Wrapper implements MethodCallHa
         let retrievedObject = weakRef.deref();
         let data = new Map<string, Object>();
         data.set("type", "onGroupSpecificationDidUpdate");
-        data.set("group", GroupHelper.toJson(group));
+        data.set("group", GroupHelper.toJson(group)!);
         retrievedObject?.channel?.invokeMethod(MethodKey.onGroupChanged, data);
       },
       onStateChanged(group: Group, isDisabled: boolean) {
