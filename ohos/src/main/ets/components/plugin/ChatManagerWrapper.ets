@@ -14,6 +14,11 @@ import { ChatClient,
   SearchDirection,
   ChatType,
   FetchReactionDetailParams,
+  RecallMessageInfo,
+  GroupReadAck,
+  ChatMessageReactionChange,
+  ChatMessagePinInfo,
+  PinOperation,
 } from "@easemob/chatsdk";
 import { FlutterPluginBinding, JSONMethodCodec,
   MethodCall,
@@ -25,12 +30,15 @@ import FetchMessageOptionHelper from "./FetchMessageOptionHelper";
 import HelpTool from "./HelpTool";
 import MethodKey from "./MethodKeys";
 import ChatErrorHelper from "./models/ChatErrorHelper";
+import ChatMessagePinInfoHelper from "./models/ChatMessagePinInfoHelper";
+import ChatMessageReactionChangeHelper from "./models/ChatMessageReactionChangeHelper";
 import ChatMessageReactionHelper from "./models/ChatMessageReactionHelper";
 import ConversationHelper from "./models/ConversationHelper";
 import CursorResultHelper from "./models/CursorResultHelper";
 import GroupReadAckHelper from "./models/GroupReadAckHelper";
 import MessageBodyHelper from "./models/MessageBodyHelper";
 import MessageHelper from "./models/MessageHelper";
+import RecallMessageInfoHelper from "./models/RecallMessageInfoHelper";
 import { GetSafetyValue, SafetyValue } from "./SafetyMapTool";
 import Wrapper from "./Wrapper";
 
@@ -45,9 +53,72 @@ export default class ChatManagerWrapper extends Wrapper implements MethodCallHan
   }
 
   public registerEaseListener(): void {
+    let weakRef = new WeakRef(this);
     this.unRegisterEaseListener();
-    // this.listener = {};
-    // this.conversationListener = {};
+    this.listener = {
+      onMessageReceived(messages: ChatMessage[]){
+        let retrievedObject = weakRef.deref();
+        retrievedObject?.channel?.invokeMethod(MethodKey.onMessagesReceived, MessageHelper.listToJson(messages));
+      },
+      onCmdMessageReceived(messages: ChatMessage[]){
+        let retrievedObject = weakRef.deref();
+        retrievedObject?.channel?.invokeMethod(MethodKey.onCmdMessagesReceived, MessageHelper.listToJson(messages));
+      },
+      onMessageRead(messages: ChatMessage[]){
+        let retrievedObject = weakRef.deref();
+        retrievedObject?.channel?.invokeMethod(MethodKey.onMessageReadAck, MessageHelper.listToJson(messages));
+      },
+      onMessageRecalled(recallInfos: RecallMessageInfo[]){
+        let retrievedObject = weakRef.deref();
+        retrievedObject?.channel?.invokeMethod(MethodKey.onMessagesRecalledInfo, RecallMessageInfoHelper.listToJson(recallInfos));
+      },
+      onMessageDelivered(messages: ChatMessage[]){
+        let retrievedObject = weakRef.deref();
+        retrievedObject?.channel?.invokeMethod(MethodKey.onMessagesDelivered, MessageHelper.listToJson(messages));
+      },
+      onGroupMessageRead(groupReadAcks: GroupReadAck[]){
+        let retrievedObject = weakRef.deref();
+        retrievedObject?.channel?.invokeMethod(MethodKey.onGroupMessageRead, GroupReadAckHelper.listToJson(groupReadAcks));
+      },
+      onReadAckForGroupMessageUpdated(){
+        let retrievedObject = weakRef.deref();
+        retrievedObject?.channel?.invokeMethod(MethodKey.onReadAckForGroupMessageUpdated, null);
+      },
+      onReactionChanged(messageReactionChanges: ChatMessageReactionChange[]){
+        let retrievedObject = weakRef.deref();
+        retrievedObject?.channel?.invokeMethod(MethodKey.onMessageReactionDidChange, ChatMessageReactionChangeHelper.listToJson(messageReactionChanges));
+      },
+      onMessageContentChanged(modifiedMessage: ChatMessage, operatorId: string, operationTime: number){
+        let retrievedObject = weakRef.deref();
+        let data = new Map<string, Object>();
+        data.set("message", MessageHelper.toJson(modifiedMessage)!);
+        data.set("operator", operatorId);
+        data.set("operationTime", operationTime);
+        retrievedObject?.channel?.invokeMethod(MethodKey.onMessageContentChanged, data);
+      },
+      onMessagePinChanged(messageId: string, conversationId: string, pinOperation: PinOperation, pinInfo: ChatMessagePinInfo){
+        let retrievedObject = weakRef.deref();
+        let data = new Map<string, Object>();
+        data.set("messageId", messageId);
+        data.set("conversationId", conversationId);
+        data.set("pinOperation", pinOperation);
+        data.set("pinInfo", ChatMessagePinInfoHelper.toJson(pinInfo));
+        retrievedObject?.channel?.invokeMethod(MethodKey.onMessagePinChanged, data);
+      },
+    };
+    this.conversationListener = {
+      onConversationUpdate(){
+        let retrievedObject = weakRef.deref();
+        retrievedObject?.channel?.invokeMethod(MethodKey.onConversationUpdate, null);
+      },
+      onConversationRead(from: string, to: string){
+        let retrievedObject = weakRef.deref();
+        let data = new Map<string, Object>();
+        data.set("from", from);
+        data.set("to", to);
+        retrievedObject?.channel?.invokeMethod(MethodKey.onConversationHasRead, data);
+      },
+    };
   }
 
   public unRegisterEaseListener(): void {
