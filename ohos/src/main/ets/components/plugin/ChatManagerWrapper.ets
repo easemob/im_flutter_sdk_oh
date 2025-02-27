@@ -26,7 +26,8 @@ import { FlutterPluginBinding, JSONMethodCodec,
   MethodResult } from "@ohos/flutter_ohos";
 import ConversationFilterHelper from "./ConversationFilterHelper";
 import EnumTool from "./EnumTool";
-import FetchMessageOptionHelper from "./FetchMessageOptionHelper";
+import FetchMessageOptionHelper from "./models/FetchMessageOptionHelper";
+
 import HelpTool from "./HelpTool";
 import MethodKey from "./MethodKeys";
 import ChatErrorHelper from "./models/ChatErrorHelper";
@@ -39,7 +40,7 @@ import GroupReadAckHelper from "./models/GroupReadAckHelper";
 import MessageBodyHelper from "./models/MessageBodyHelper";
 import MessageHelper from "./models/MessageHelper";
 import RecallMessageInfoHelper from "./models/RecallMessageInfoHelper";
-import { GetSafetyValue, SafetyValue } from "./SafetyMapTool";
+import { GetSafetyValue } from "./SafetyMapTool";
 import Wrapper from "./Wrapper";
 
 export default class ChatManagerWrapper extends Wrapper implements MethodCallHandler {
@@ -49,7 +50,7 @@ export default class ChatManagerWrapper extends Wrapper implements MethodCallHan
 
   constructor(binding: FlutterPluginBinding, channelName: string) {
     super(binding, channelName);
-    this.messageChannel = new MethodChannel(binding.getBinaryMessenger(), "com.chat,im/chat_message", JSONMethodCodec.INSTANCE);
+    this.messageChannel = new MethodChannel(binding.getBinaryMessenger(), "com.chat.im/chat_message", JSONMethodCodec.INSTANCE);
   }
 
   public registerEaseListener(): void {

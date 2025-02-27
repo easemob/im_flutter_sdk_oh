@@ -1,6 +1,7 @@
 import { FetchMessageOption, ContentType } from "@easemob/chatsdk";
-import EnumTool from "./EnumTool";
-import { GetSafetyValue } from "./SafetyMapTool";
+import EnumTool from "../EnumTool";
+import { GetSafetyValue } from "../SafetyMapTool";
+
 
 export default class FetchMessageOptionHelper {
   static fromJson(json: Map<string, Object> | undefined | null): FetchMessageOption | undefined{

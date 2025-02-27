@@ -2,7 +2,6 @@ import { ChatMessageBody, CmdMessageBody,
   CombineMessageBody,
   CombineMessageParams,
   CustomMessageBody,
-  DownloadStatus,
   FileMessageBody,
   ImageMessageBody,
   LocationMessageBody, TextMessageBody,
@@ -23,8 +22,8 @@ export default  class MessageBodyHelper {
   }
 
 
-  static textBodyFromJson(json: Map<string, Object>): TextMessageBody {
-    let content = json.get("content") as string;
+  static textBodyFromJson(json: object): TextMessageBody {
+    let content = GetSafetyValue(json, "content") as string;
     // TODO: 不支持翻译
     let ret = new TextMessageBody(content);
     return ret;
@@ -36,15 +35,14 @@ export default  class MessageBodyHelper {
     return data;
   }
 
-  static localBodyFromJson(json: Map<string, Object>): LocationMessageBody {
-    let latitude = json.get("latitude") as number;
-    let longitude = json.get("longitude") as number;
+  static localBodyFromJson(json: object): LocationMessageBody {
+    let latitude = GetSafetyValue(json, "latitude") as number;
+    let longitude = GetSafetyValue(json, "longitude") as number;
     let ret = new LocationMessageBody(
       latitude,
       longitude,
       GetSafetyValue(json, "address"),
-      GetSafetyValue(json, "buildingName"
-      )
+      GetSafetyValue(json, "buildingName")
     );
     return ret;
   }
@@ -58,8 +56,8 @@ export default  class MessageBodyHelper {
     return data;
   }
 
-  static cmdBodyFromJson(json: Map<string, Object>): CmdMessageBody {
-    let action = json.get("action") as string;
+  static cmdBodyFromJson(json: object): CmdMessageBody {
+    let action = GetSafetyValue(json, "action") as string;
     let ret = new CmdMessageBody(action);
     return ret;
   }
@@ -70,8 +68,8 @@ export default  class MessageBodyHelper {
     return data;
   }
 
-  static customBodyFromJson(json: Map<string, Object>): CustomMessageBody {
-    let event = json.get("event") as string;
+  static customBodyFromJson(json: object): CustomMessageBody {
+    let event = GetSafetyValue(json, "event") as string;
     let ret = new CustomMessageBody(event);
     ret.setParams(GetSafetyValue(json, "params"));
     return ret;
@@ -84,8 +82,8 @@ export default  class MessageBodyHelper {
     return data;
   }
 
-  static fileBodyFromJson(json: Map<string, Object>): FileMessageBody {
-    let localPath = json.get("localPath") as string;
+  static fileBodyFromJson(json: object): FileMessageBody {
+    let localPath = GetSafetyValue(json, "localPath") as string;
     let ret = new FileMessageBody(localPath);
     ret.setFileName(GetSafetyValue(json, "displayName"));
     ret.setRemoteUrl(GetSafetyValue(json, "remotePath"));
@@ -106,8 +104,8 @@ export default  class MessageBodyHelper {
     return data;
   }
 
-  static imageBodyFromJson(json: Map<string, Object>): ImageMessageBody {
-    let localPath = json.get("localPath") as string;
+  static imageBodyFromJson(json: object): ImageMessageBody {
+    let localPath = GetSafetyValue(json, "localPath") as string;
     let ret = new ImageMessageBody(localPath);
     ret.setFileName(GetSafetyValue(json, "displayName"));
     ret.setRemoteUrl(GetSafetyValue(json, "remotePath"));
@@ -142,8 +140,8 @@ export default  class MessageBodyHelper {
     return data;
   }
 
-  static videoBodyFromJson(json: Map<string, Object>): VideoMessageBody {
-    let localPath = json.get("localPath") as string;
+  static videoBodyFromJson(json: object): VideoMessageBody {
+    let localPath = GetSafetyValue(json, "localPath") as string;
     let ret = new VideoMessageBody(localPath, 10);
     ret.setDuration(GetSafetyValue(json, "duration"));
     ret.setThumbnailRemoteUrl(GetSafetyValue(json, "thumbnailRemotePath"));
@@ -179,8 +177,8 @@ export default  class MessageBodyHelper {
     return data;
   }
 
-  static voiceBodyFromJson(json: Map<string, Object>): VoiceMessageBody {
-    let localPath = json.get("localPath") as string;
+  static voiceBodyFromJson(json: object): VoiceMessageBody {
+    let localPath = GetSafetyValue(json, "localPath") as string;
     let ret = new VoiceMessageBody(localPath, 10);
     ret.setDuration(GetSafetyValue(json, "duration"));
     ret.setDownloadStatus(EnumTool.downloadStatusFromInt(GetSafetyValue(json, "fileStatus")));
@@ -205,7 +203,7 @@ export default  class MessageBodyHelper {
     return data;
   }
 
-  static combineBodyFromJson(json: Map<string, Object>): CombineMessageBody {
+  static combineBodyFromJson(json: object): CombineMessageBody {
     let ret = new CombineMessageBody(new CombineMessageParams());
     ret.setTitle(GetSafetyValue(json, "title"));
     ret.setSummary(GetSafetyValue(json, "summary"));
