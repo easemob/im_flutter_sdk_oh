@@ -1,5 +1,8 @@
 import {
-  FlutterPluginBinding, MethodCall, MethodCallHandler, MethodChannel, MethodResult } from "@ohos/flutter_ohos";
+  FlutterPluginBinding,
+  JSONMethodCodec,
+  MethodCall, MethodCallHandler, MethodChannel, MethodResult,
+  StandardMethodCodec } from "@ohos/flutter_ohos";
 import { common } from "@kit.AbilityKit";
 import { ChatError } from "@easemob/chatsdk";
 import ChatErrorHelper from "./models/ChatErrorHelper";
@@ -13,7 +16,9 @@ export default class Wrapper implements  MethodCallHandler{
   constructor(binding: FlutterPluginBinding, channelName: string) {
     this.context = binding.getApplicationContext();
     this.binding = binding;
-    this.channel = new MethodChannel(this.binding.getBinaryMessenger(), `com.chat.im/${channelName}`);
+    let channelKey = `com.chat.im/${channelName}`;
+    console.log(`channelKey:  ${channelKey}`);
+    this.channel = new MethodChannel(this.binding.getBinaryMessenger(), channelKey, JSONMethodCodec.INSTANCE);
     this.channel.setMethodCallHandler(this);
     this.registerEaseListener();
   }
@@ -43,7 +48,7 @@ export default class Wrapper implements  MethodCallHandler{
     result.notImplemented();
   }
 
- public registerEaseListener() {}
+  public registerEaseListener() {}
 
   public unRegisterEaseListener() {}
 

@@ -8,7 +8,8 @@ import { ChatMessage, MessageDirection, ContentType, MessageStatus, MessageExtTy
   FileMessageBody,
   VideoMessageBody,
   VoiceMessageBody,
-  CombineMessageBody} from "@easemob/chatsdk";
+  CombineMessageBody,
+  ChatroomMessagePriority} from "@easemob/chatsdk";
 import EnumTool from "../EnumTool";
 
 import { JSON } from "@kit.ArkTS";
@@ -18,9 +19,9 @@ import { GetSafetyValue, SafetyValue } from "../SafetyMapTool";
 export default class MessageHelper {
   static fromJson(json: Map<string, Object>): ChatMessage {
     let message: ChatMessage | undefined;
-    let bodyMap = json.get("body") as Map<string, Object>;
-    let bodyType = EnumTool.messageBodyTypeFromInt(json.get("type") as number);
-    let direct = EnumTool.messageDirectFromInt(json.get("direction")as number);
+    let bodyMap = GetSafetyValue(json, "body") as object;
+    let bodyType = EnumTool.messageBodyTypeFromInt(GetSafetyValue(bodyMap, "type") as number);
+    let direct = EnumTool.messageDirectFromInt(GetSafetyValue(json, "direction") as number);
 
     let to = json.get("to") as string;
     let from = json.get("from") as string;
@@ -82,6 +83,7 @@ export default class MessageHelper {
     }
     message?.setTo(to);
     message?.setFrom(from);
+    message?.setDirection(direct);
     message?.setReceiverRead(GetSafetyValue(json, "hasReadAck"));
     let status = EnumTool.messageStatusFromInt(json.get("status") as number);
     message?.setStatus(status);
@@ -97,7 +99,11 @@ export default class MessageHelper {
     if(json.has("serverTime")) {
       message?.setServerTimestamp(GetSafetyValue(json, "serverTime"));
     }
-    message?.setPriority(GetSafetyValue(json, "chatroomMessagePriority"));
+    let priority: ChatroomMessagePriority | undefined = GetSafetyValue(json, "chatroomMessagePriority");
+    if(priority != undefined) {
+      message?.setPriority(priority);
+    }
+
     message?.setMsgId(msgId);
     if(json.has("attributes")) {
       let attributes = json.get("attributes") as Map<string, Object>;
