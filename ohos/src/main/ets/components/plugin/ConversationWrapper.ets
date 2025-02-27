@@ -8,7 +8,7 @@ import {
 } from '@easemob/chatsdk';
 import { FlutterPluginBinding, MethodCall, MethodCallHandler, MethodResult } from '@ohos/flutter_ohos';
 import MethodKey from './MethodKeys';
-import { MessageHelper } from './models/MessageHelper';
+import MessageHelper from './models/MessageHelper';
 import Wrapper from './Wrapper';
 
 export default class ConversationWrapper extends Wrapper implements MethodCallHandler {
@@ -164,7 +164,6 @@ export default class ConversationWrapper extends Wrapper implements MethodCallHa
           conversation?.removeMessage(item);
         })
       }
-      // todo
       this.onSuccess(result, call.method, true);
     } else {
       this.onError(result, ChatError.createError(ChatError.INVALID_PARAM, 'Conversation is undefined!'));
@@ -208,7 +207,7 @@ export default class ConversationWrapper extends Wrapper implements MethodCallHa
   private insertMessage(call: MethodCall, result: MethodResult) {
     let conversation = this.conversationWithParam(call);
     if (conversation) {
-      let msgJson = call.argument('msg') as string;
+      let msgJson = call.argument('msg') as Map<string, Object>;
       let message = MessageHelper.fromJson(msgJson);
       if (message) {
         this.onSuccess(result, call.method, conversation.insertMessage(message));
@@ -221,7 +220,7 @@ export default class ConversationWrapper extends Wrapper implements MethodCallHa
   private appendMessage(call: MethodCall, result: MethodResult) {
     let conversation = this.conversationWithParam(call);
     if (conversation) {
-      let msgJson = call.argument('msg') as string;
+      let msgJson = call.argument('msg') as Map<string, Object>;
       let message = MessageHelper.fromJson(msgJson);
       if (message) {
         this.onSuccess(result, call.method, conversation.appendMessage(message));
@@ -234,7 +233,7 @@ export default class ConversationWrapper extends Wrapper implements MethodCallHa
   private updateConversationMessage(call: MethodCall, result: MethodResult) {
     let conversation = this.conversationWithParam(call);
     if (conversation) {
-      let msgJson = call.argument('msg') as string;
+      let msgJson = call.argument('msg') as Map<string, Object>;
       let message = MessageHelper.fromJson(msgJson);
       if (message) {
         // todo 增加 HelpTool.mergeMessage
@@ -276,7 +275,10 @@ export default class ConversationWrapper extends Wrapper implements MethodCallHa
       conversation.loadMoreMessagesFromDB(startId, count, direction).then(r => {
         let messageResult: Map<string, object>[] = [];
         r.forEach(message => {
-          messageResult.push(MessageHelper.toJson(message));
+          let map = MessageHelper.toJson(message);
+          if (map) {
+            messageResult.push(map);
+          }
         })
         this.onSuccess(result, call.method, messageResult);
       }).catch((e: ChatError) => {
@@ -305,7 +307,10 @@ export default class ConversationWrapper extends Wrapper implements MethodCallHa
       conversation.searchMessagesByKeywords(keywords, timestamp, maxCount, from, direction).then(r => {
         let messageResult: Map<string, object>[] = [];
         r.forEach(message => {
-          messageResult.push(MessageHelper.toJson(message));
+          let map = MessageHelper.toJson(message);
+          if (map) {
+            messageResult.push(map);
+          }
         })
         this.onSuccess(result, call.method, messageResult);
       }).catch((e: ChatError) => {
@@ -334,7 +339,10 @@ export default class ConversationWrapper extends Wrapper implements MethodCallHa
       conversation.searchMessagesByType(msgType, timestamp, maxCount, from, direction).then(r => {
         let messageResult: Map<string, object>[] = [];
         r.forEach(message => {
-          messageResult.push(MessageHelper.toJson(message));
+          let map = MessageHelper.toJson(message);
+          if (map) {
+            messageResult.push(map);
+          }
         })
         this.onSuccess(result, call.method, messageResult);
       }).catch((e: ChatError) => {
@@ -354,7 +362,10 @@ export default class ConversationWrapper extends Wrapper implements MethodCallHa
       conversation.searchMessagesBetweenTime(startTime, endTime, maxCount).then(r => {
         let messageResult: Map<string, object>[] = [];
         r.forEach(message => {
-          messageResult.push(MessageHelper.toJson(message));
+          let map = MessageHelper.toJson(message);
+          if (map) {
+            messageResult.push(map);
+          }
         })
         this.onSuccess(result, call.method, messageResult);
       }).catch((e: ChatError) => {
@@ -402,7 +413,10 @@ export default class ConversationWrapper extends Wrapper implements MethodCallHa
       conversation.getPinnedMessages().then(r => {
         let messageResult: Map<string, object>[] = [];
         r.forEach(message => {
-          messageResult.push(MessageHelper.toJson(message));
+          let map = MessageHelper.toJson(message);
+          if (map) {
+            messageResult.push(map);
+          }
         })
         this.onSuccess(result, call.method, messageResult);
       }).catch((e: ChatError) => {
@@ -440,7 +454,10 @@ export default class ConversationWrapper extends Wrapper implements MethodCallHa
       conversation.searchMessagesByType(msgTypes, timestamp, maxCount, from, direction).then(r => {
         let messageResult: Map<string, object>[] = [];
         r.forEach(message => {
-          messageResult.push(MessageHelper.toJson(message));
+          let map = MessageHelper.toJson(message);
+          if (map) {
+            messageResult.push(map);
+          }
         })
         this.onSuccess(result, call.method, messageResult);
       }).catch((e: ChatError) => {
