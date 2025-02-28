@@ -7,6 +7,7 @@ import {
   SearchDirection
 } from '@easemob/chatsdk';
 import { FlutterPluginBinding, MethodCall, MethodCallHandler, MethodResult } from '@ohos/flutter_ohos';
+import HelpTool from './HelpTool';
 import MethodKey from './MethodKeys';
 import MessageHelper from './models/MessageHelper';
 import Wrapper from './Wrapper';
@@ -137,8 +138,13 @@ export default class ConversationWrapper extends Wrapper implements MethodCallHa
   private syncConversationExt(call: MethodCall, result: MethodResult) {
     let conversation = this.conversationWithParam(call);
     if (conversation) {
-      let ext = call.argument('ext') as string;
-      conversation.setExtField(ext);
+      let ext = call.argument('ext') as Map<string, string>;
+      const extObj: Record<string, string> = {};
+      ext.forEach((value, key) => {
+        extObj[key] = value;
+      });
+      const extJson = JSON.stringify(extObj);
+      conversation.setExtField(extJson);
       this.onSuccess(result, call.method, true);
     } else {
       this.onError(result, ChatError.createError(ChatError.INVALID_PARAM, 'Conversation is undefined!'));
@@ -236,11 +242,12 @@ export default class ConversationWrapper extends Wrapper implements MethodCallHa
       let msgJson = call.argument('msg') as Map<string, Object>;
       let message = MessageHelper.fromJson(msgJson);
       if (message) {
-        // todo 增加 HelpTool.mergeMessage
-        this.onSuccess(result, call.method, conversation.updateMessage(message));
-      } else {
-        // todo 检查逻辑
-        this.onSuccess(result, call.method, false);
+        let dbMsg = ChatClient.getInstance().chatManager()?.getMessage(message.getMsgId());
+        if (dbMsg) {
+          HelpTool.mergeMessage(message, dbMsg);
+          conversation.updateMessage(dbMsg);
+        }
+        this.onSuccess(result, call.method, true);
       }
     } else {
       this.onError(result, ChatError.createError(ChatError.INVALID_PARAM, 'Conversation is undefined!'));
@@ -289,6 +296,7 @@ export default class ConversationWrapper extends Wrapper implements MethodCallHa
     }
   }
 
+  // todo 不支持scope
   private loadMsgWithKeywords(call: MethodCall, result: MethodResult) {
     let conversation = this.conversationWithParam(call);
     if (conversation) {
@@ -303,7 +311,6 @@ export default class ConversationWrapper extends Wrapper implements MethodCallHa
       if (call.hasArgument('direction')) {
         direction = call.argument('direction') as SearchDirection;
       }
-      // todo 不支持scope
       conversation.searchMessagesByKeywords(keywords, timestamp, maxCount, from, direction).then(r => {
         let messageResult: Map<string, object>[] = [];
         r.forEach(message => {
@@ -321,6 +328,7 @@ export default class ConversationWrapper extends Wrapper implements MethodCallHa
     }
   }
 
+  // todo 校验消息类型是否正确
   private loadMsgWithMsgType(call: MethodCall, result: MethodResult) {
     let conversation = this.conversationWithParam(call);
     if (conversation) {
@@ -334,7 +342,6 @@ export default class ConversationWrapper extends Wrapper implements MethodCallHa
       if (call.hasArgument('direction')) {
         direction = call.argument('direction') as SearchDirection;
       }
-      // todo 校验消息类型是否正确
       let msgType = call.argument('msgType') as ContentType;
       conversation.searchMessagesByType(msgType, timestamp, maxCount, from, direction).then(r => {
         let messageResult: Map<string, object>[] = [];
@@ -436,6 +443,7 @@ export default class ConversationWrapper extends Wrapper implements MethodCallHa
     }
   }
 
+  // todo 校验消息类型是否正确
   private searchMsgByOptions(call: MethodCall, result: MethodResult) {
     let conversation = this.conversationWithParam(call);
     if (conversation) {
@@ -449,7 +457,6 @@ export default class ConversationWrapper extends Wrapper implements MethodCallHa
       if (call.hasArgument('direction')) {
         direction = call.argument('direction') as SearchDirection;
       }
-      // todo 校验消息类型是否正确
       let msgTypes = call.argument('types') as ContentType[];
       conversation.searchMessagesByType(msgTypes, timestamp, maxCount, from, direction).then(r => {
         let messageResult: Map<string, object>[] = [];
