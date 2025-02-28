@@ -9,7 +9,9 @@ import { ChatMessage, MessageDirection, ContentType, MessageStatus, MessageExtTy
   VideoMessageBody,
   VoiceMessageBody,
   CombineMessageBody,
-  ChatroomMessagePriority} from "@easemob/chatsdk";
+  ChatroomMessagePriority,
+  ChatMessageReaction,
+  ChatMessagePinInfo} from "@easemob/chatsdk";
 import EnumTool from "../EnumTool";
 
 import { JSON } from "@kit.ArkTS";
@@ -193,5 +195,25 @@ export default class MessageHelper {
       }
     }
     return list;
+  }
+}
+
+export class MessageReactionHelper {
+  static toJson(reaction: ChatMessageReaction): Map<string, Object> {
+    const data = new Map<string, Object>();
+    data.set("reaction", reaction.reaction());
+    data.set("count", reaction.userCount());
+    data.set("isAddedBySelf", reaction.isAddedBySelf());
+    data.set("userList", reaction.userIds());
+    return data;
+  }
+}
+
+export class MessagePinInfoHelper {
+  static toJson(info: ChatMessagePinInfo): Map<string, Object> {
+    const data = new Map<string, Object>();
+    data.set("pinTime", info.pinTime());
+    data.set("operatorId", info.operatorId());
+    return data;
   }
 }
