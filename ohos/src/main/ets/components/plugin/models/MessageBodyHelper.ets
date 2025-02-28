@@ -6,17 +6,21 @@ import { ChatMessageBody, CmdMessageBody,
   ImageMessageBody,
   LocationMessageBody, TextMessageBody,
   VideoMessageBody,
-  VoiceMessageBody
+  VoiceMessageBody,
+  ContentType,
 } from "@easemob/chatsdk";
+import { Any } from "@ohos/flutter_ohos";
 import EnumTool from "../EnumTool";
-import { GetSafetyValue, SafetyValue } from "../SafetyMapTool";
+import { GetSafetyValue, IsObj, ObjToMap, SafetyValue } from "../SafetyMapTool";
 
 export default  class MessageBodyHelper {
   static getParentMap(body: ChatMessageBody): Map<string, Object> {
     let data = new Map<string, Object>();
-    SafetyValue(body.operatorId(), (value)=>data.set("operatorId", value));
-    SafetyValue(body.operationCount(), (value)=>data.set("operatorCount", value));
-    SafetyValue(body.operationTime(), (value)=>data.set("operatorTime", value));
+    if(body.type() == ContentType.TXT ){
+      SafetyValue(body.operatorId(), (value)=>data.set("operatorId", value));
+      SafetyValue(body.operationCount(), (value)=>data.set("operatorCount", value));
+      SafetyValue(body.operationTime(), (value)=>data.set("operatorTime", value));
+    }
     data.set("type", EnumTool.messageBodyTypeToInt(body.type()));
     return data;
   }
@@ -71,7 +75,10 @@ export default  class MessageBodyHelper {
   static customBodyFromJson(json: object): CustomMessageBody {
     let event = GetSafetyValue(json, "event") as string;
     let ret = new CustomMessageBody(event);
-    ret.setParams(GetSafetyValue(json, "params"));
+    let obj : Any = GetSafetyValue(json, "params");
+    if(IsObj(obj)) {
+      ret.setParams(ObjToMap(obj));
+    }
     return ret;
   }
 

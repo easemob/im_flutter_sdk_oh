@@ -14,7 +14,8 @@ import EnumTool from "../EnumTool";
 
 import { JSON } from "@kit.ArkTS";
 import MessageBodyHelper from "./MessageBodyHelper";
-import { GetSafetyValue, SafetyValue } from "../SafetyMapTool";
+import { GetSafetyValue, IsObj, SafetyValue } from "../SafetyMapTool";
+import { Any } from "@ohos/flutter_ohos";
 
 export default class MessageHelper {
   static fromJson(json: Map<string, Object>): ChatMessage {
@@ -105,17 +106,20 @@ export default class MessageHelper {
     }
 
     message?.setMsgId(msgId);
-    if(json.has("attributes")) {
-      let attributes = json.get("attributes") as Map<string, Object>;
+    let attributes: Any = GetSafetyValue(json, "attributes");
+    if(IsObj(attributes)) {
       let ext = new Map<string, MessageExtType>();
-      attributes.forEach((v, k)=>{
-          if(typeof v === "number" || typeof v === "string" || typeof v === "boolean") {
-            ext.set(k, v);
-          }else if(v instanceof Object){
-            // TODO: 待验证
-            message?.setJsonAttribute(k, JSON.stringify(v));
-          }
-      });
+      let keys = Object.keys(attributes);
+      for (let index = 0; index < keys.length; index++) {
+        const k = keys[index];
+        const v = attributes[k] as object;
+        if(typeof v === "number" || typeof v === "string" || typeof v === "boolean") {
+          ext.set(k, v);
+        }else if(v instanceof Object){
+          // TODO: 待验证
+          message?.setJsonAttribute(k, JSON.stringify(v));
+        }
+      }
       if(ext.size != 0) {
         message?.setExt(ext);
       }

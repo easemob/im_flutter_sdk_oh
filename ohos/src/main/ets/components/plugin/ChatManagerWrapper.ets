@@ -120,6 +120,9 @@ export default class ChatManagerWrapper extends Wrapper implements MethodCallHan
         retrievedObject?.channel?.invokeMethod(MethodKey.onConversationHasRead, data);
       },
     };
+
+    ChatClient.getInstance().chatManager()?.addMessageListener(this.listener);
+    ChatClient.getInstance().chatManager()?.addConversationListener(this.conversationListener);
   }
 
   public unRegisterEaseListener(): void {
