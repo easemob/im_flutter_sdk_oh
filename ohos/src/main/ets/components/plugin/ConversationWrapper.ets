@@ -138,8 +138,13 @@ export default class ConversationWrapper extends Wrapper implements MethodCallHa
   private syncConversationExt(call: MethodCall, result: MethodResult) {
     let conversation = this.conversationWithParam(call);
     if (conversation) {
-      let ext = call.argument('ext') as string;
-      conversation.setExtField(ext);
+      let ext = call.argument('ext') as Map<string, string>;
+      const extObj: Record<string, string> = {};
+      ext.forEach((value, key) => {
+        extObj[key] = value;
+      });
+      const extJson = JSON.stringify(extObj);
+      conversation.setExtField(extJson);
       this.onSuccess(result, call.method, true);
     } else {
       this.onError(result, ChatError.createError(ChatError.INVALID_PARAM, 'Conversation is undefined!'));
