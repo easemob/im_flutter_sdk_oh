@@ -404,7 +404,7 @@ export default class ChatManagerWrapper extends Wrapper implements MethodCallHan
   }
 
   private updateChatMessage(call: MethodCall, result: MethodResult) {
-    let msg = MessageHelper.fromJson(call.args);
+    let msg = MessageHelper.fromJson(call.argument("message"));
     let dbMsg = ChatClient.getInstance().chatManager()?.getMessage(msg.getMsgId());
     if(!dbMsg) {
       dbMsg = msg;
@@ -612,7 +612,7 @@ export default class ChatManagerWrapper extends Wrapper implements MethodCallHan
 
   private deleteRemoteConversation(call: MethodCall, result: MethodResult) {
     let conversationId: string| undefined = GetSafetyValue(call.args, "conversationId");
-    let type = EnumTool.conversationTypeFromInt(call.argument("type") as number);
+    let type = EnumTool.conversationTypeFromInt(call.argument("conversationType") as number);
     let deleteMessages = call.argument("isDeleteRemoteMessage") as boolean;
     ChatClient.getInstance().chatManager()?.deleteConversationFromServer(conversationId, type, deleteMessages)
       .then(()=>this.onSuccess(result, call.method))
@@ -650,7 +650,7 @@ export default class ChatManagerWrapper extends Wrapper implements MethodCallHan
   private fetchReactionList(call: MethodCall, result: MethodResult) {
     let msgIds: Array<string> | undefined = GetSafetyValue(call.args, "msgIds");
     let groupId: string| undefined = GetSafetyValue(call.args, "groupId");
-    let chatType: ChatType | undefined = EnumTool.chatTypeFromInt(GetSafetyValue(call.args, "chatType"));
+    let chatType = EnumTool.chatTypeFromInt(GetSafetyValue(call.args, "chatType")! as number);
     ChatClient.getInstance().chatManager()?.fetchReactions(msgIds, chatType, groupId)
       .then((value)=>{
         let data = new Map<string, Object>();

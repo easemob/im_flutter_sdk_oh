@@ -154,12 +154,12 @@ export default  class MessageBodyHelper {
     ret.setThumbnailRemoteUrl(GetSafetyValue(json, "thumbnailRemotePath"));
     ret.setThumbnailLocalPath(GetSafetyValue(json, "thumbnailLocalPath"));
     ret.setThumbnailSecret(GetSafetyValue(json, "thumbnailSecret"));
-    ret.setThumbnailDownloadStatus(EnumTool.downloadStatusFromInt(GetSafetyValue(json, "thumbnailStatus")))
+    ret.setThumbnailDownloadStatus(EnumTool.downloadStatusFromInt(GetSafetyValue(json, "thumbnailStatus")! as number))
     ret.setFileName(GetSafetyValue(json, "displayName"));
     ret.setRemoteUrl(GetSafetyValue(json, "remotePath"));
     ret.setSecretKey(GetSafetyValue(json, "secret"));
     ret.setFileLength(GetSafetyValue(json, "fileSize"));
-    ret.setDownloadStatus(EnumTool.downloadStatusFromInt(GetSafetyValue(json, "fileStatus")));
+    ret.setDownloadStatus(EnumTool.downloadStatusFromInt(GetSafetyValue(json, "fileStatus")! as number));
     ret.setThumbnailSize(GetSafetyValue(json, "width"), GetSafetyValue(json, "height"))
 
     return ret;
@@ -188,7 +188,7 @@ export default  class MessageBodyHelper {
     let localPath = GetSafetyValue(json, "localPath") as string;
     let ret = new VoiceMessageBody(localPath, 10);
     ret.setDuration(GetSafetyValue(json, "duration"));
-    ret.setDownloadStatus(EnumTool.downloadStatusFromInt(GetSafetyValue(json, "fileStatus")));
+    ret.setDownloadStatus(EnumTool.downloadStatusFromInt(GetSafetyValue(json, "fileStatus")! as number));
     ret.setFileName(GetSafetyValue(json, "displayName"));
     ret.setSecretKey(GetSafetyValue(json, "secret"));
     ret.setRemoteUrl(GetSafetyValue(json, "remotePath"));
@@ -219,7 +219,7 @@ export default  class MessageBodyHelper {
     ret.setRemoteUrl(GetSafetyValue(json, "remotePath"));
     ret.setSecretKey(GetSafetyValue(json, "secret"));
     ret.setMessageList(GetSafetyValue(json, "messageList"));
-    ret.setDownloadStatus(EnumTool.downloadStatusFromInt(GetSafetyValue(json, "fileStatus")));
+    ret.setDownloadStatus(EnumTool.downloadStatusFromInt(GetSafetyValue(json, "fileStatus")! as number));
     return ret;
   }
 

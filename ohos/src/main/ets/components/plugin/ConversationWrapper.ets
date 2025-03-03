@@ -10,7 +10,9 @@ import { FlutterPluginBinding, MethodCall, MethodCallHandler, MethodResult } fro
 import HelpTool from './HelpTool';
 import MethodKey from './MethodKeys';
 import MessageHelper from './models/MessageHelper';
+import { GetSafetyValue, IsObj } from './SafetyMapTool';
 import Wrapper from './Wrapper';
+import { Any } from "@ohos/flutter_ohos";
 
 export default class ConversationWrapper extends Wrapper implements MethodCallHandler {
   constructor(binding: FlutterPluginBinding, channelName: string) {
@@ -138,13 +140,11 @@ export default class ConversationWrapper extends Wrapper implements MethodCallHa
   private syncConversationExt(call: MethodCall, result: MethodResult) {
     let conversation = this.conversationWithParam(call);
     if (conversation) {
-      let ext = call.argument('ext') as Map<string, string>;
-      const extObj: Record<string, string> = {};
-      ext.forEach((value, key) => {
-        extObj[key] = value;
-      });
-      const extJson = JSON.stringify(extObj);
-      conversation.setExtField(extJson);
+      let ext: Any = GetSafetyValue(call.args, "ext");
+      if(IsObj(ext)) {
+        const extJson = JSON.stringify(ext);
+        conversation.setExtField(extJson);
+      }
       this.onSuccess(result, call.method, true);
     } else {
       this.onError(result, ChatError.createError(ChatError.INVALID_PARAM, 'Conversation is undefined!'));

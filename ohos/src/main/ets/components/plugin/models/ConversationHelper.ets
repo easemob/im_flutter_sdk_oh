@@ -13,7 +13,7 @@ export default class ConversationHelper {
     SafetyValue(conv.marks(), (value)=> ret.set("marks", value));
     let str = conv.getExtField();
     if(str.length > 0) {
-      SafetyValue(conv.getExtField(), (value)=> ret.set("ext", JSON.stringify(value)));
+      SafetyValue(conv.getExtField(), (value)=> ret.set("ext", JSON.parse(value)));
     }
 
     ret.set("isThread", false);

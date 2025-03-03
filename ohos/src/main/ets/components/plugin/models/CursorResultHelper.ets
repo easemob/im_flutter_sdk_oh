@@ -18,6 +18,7 @@ export default class CursorResultHelper {
 
       for (let index = 0; index < result.getResult().length; index++) {
         const element = result.getResult()[index];
+        if(element == undefined) continue;
         if (element instanceof ChatMessage) {
           let item = MessageHelper.toJson(element);
           if(item){
