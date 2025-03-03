@@ -55,7 +55,8 @@ export default class CursorResultHelper {
         else if (element instanceof Contact) {
           list.push(ContactHelper.toJson(element));
         }
-        else if (element instanceof String) {
+
+        else if (typeof element === "string") {
           list.push(element);
         }
       }
