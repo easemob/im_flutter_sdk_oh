@@ -11,7 +11,11 @@ export default class ConversationHelper {
     SafetyValue(conv.getPinnedTime(), (value)=>ret.set("pinnedTime", value));
     SafetyValue(conv.isPinned(), (value)=>ret.set("isPinned", value));
     SafetyValue(conv.marks(), (value)=> ret.set("marks", value));
-    SafetyValue(conv.getExtField(), (value)=> ret.set("ext", value));
+    let str = conv.getExtField();
+    if(str.length > 0) {
+      SafetyValue(conv.getExtField(), (value)=> ret.set("ext", JSON.parse(value)));
+    }
+
     ret.set("isThread", false);
     return ret;
   }

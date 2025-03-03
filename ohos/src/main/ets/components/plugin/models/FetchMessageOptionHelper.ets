@@ -4,7 +4,7 @@ import { GetSafetyValue } from "../SafetyMapTool";
 
 
 export default class FetchMessageOptionHelper {
-  static fromJson(json: Map<string, Object> | undefined | null): FetchMessageOption | undefined{
+  static fromJson(json: object | undefined | null): FetchMessageOption | undefined{
     if(!json) {
       return undefined;
     }
@@ -15,7 +15,7 @@ export default class FetchMessageOptionHelper {
     ret.setEndTime(GetSafetyValue(json, "endTs"));
     ret.setFrom(GetSafetyValue(json, "from"));
     let types = new Array<ContentType>();
-    let typeList = json.get("msgTypes") as Array<number>
+    let typeList = GetSafetyValue(json, "msgTypes") as Array<number>
     for (let index = 0; index < typeList.length; index++) {
       const element = typeList[index];
       types.push(EnumTool.messageBodyTypeFromInt(element));

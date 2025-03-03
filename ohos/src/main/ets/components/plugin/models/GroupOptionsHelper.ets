@@ -3,10 +3,10 @@ import { Any } from "@ohos/flutter_ohos";
 import { GetSafetyValue, SafetyValue } from "../SafetyMapTool";
 
 export default class GroupOptionsHelper {
-  static fromJson(json: Map<string, Any>): GroupOptions {
+  static fromJson(json: object): GroupOptions {
     let options = new GroupOptions();
 
-    let map = json.get("options")! as Map<string, Object>;
+    let map =  GetSafetyValue(json, "options") as Map<string, Object>;
     options.maxUsers = GetSafetyValue(map, "maxCount");
     options.inviteNeedConfirm = GetSafetyValue(map, "inviteNeedConfirm");
     options.extField = GetSafetyValue(map, "ext");

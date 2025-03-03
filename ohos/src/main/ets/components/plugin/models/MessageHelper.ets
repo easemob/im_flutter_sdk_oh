@@ -11,24 +11,26 @@ import { ChatMessage, MessageDirection, ContentType, MessageStatus, MessageExtTy
   CombineMessageBody,
   ChatroomMessagePriority,
   ChatMessageReaction,
-  ChatMessagePinInfo} from "@easemob/chatsdk";
+  ChatMessagePinInfo,
+  ChatType} from "@easemob/chatsdk";
 import EnumTool from "../EnumTool";
 
 import { JSON } from "@kit.ArkTS";
 import MessageBodyHelper from "./MessageBodyHelper";
-import { GetSafetyValue, SafetyValue } from "../SafetyMapTool";
+import { GetSafetyValue, IsObj, SafetyValue } from "../SafetyMapTool";
+import { Any } from "@ohos/flutter_ohos";
 
 export default class MessageHelper {
   static fromJson(json: Map<string, Object>): ChatMessage {
     let message: ChatMessage | undefined;
     let bodyMap = GetSafetyValue(json, "body") as object;
-    let bodyType = EnumTool.messageBodyTypeFromInt(GetSafetyValue(bodyMap, "type") as number);
-    let direct = EnumTool.messageDirectFromInt(GetSafetyValue(json, "direction") as number);
+    let bodyType = EnumTool.messageBodyTypeFromInt(GetSafetyValue(bodyMap, "type")! as number);
+    let direct = EnumTool.messageDirectFromInt(GetSafetyValue(json, "direction")! as number);
 
-    let to = json.get("to") as string;
-    let from = json.get("from") as string;
-    let chatType = EnumTool.chatTypeFromInt(json.get("chatType") as number);
-    let msgId = json.get("msgId") as string;
+    let to = GetSafetyValue(json, "to") as string;
+    let from = GetSafetyValue(json, "from") as string;
+    let chatType = EnumTool.chatTypeFromInt(GetSafetyValue(json, "chatType")! as number);
+    let msgId = GetSafetyValue(json, "msgId") as string;
     let body: ChatMessageBody | undefined;
 
     switch (bodyType) {
@@ -87,37 +89,39 @@ export default class MessageHelper {
     message?.setFrom(from);
     message?.setDirection(direct);
     message?.setReceiverRead(GetSafetyValue(json, "hasReadAck"));
-    let status = EnumTool.messageStatusFromInt(json.get("status") as number);
+    let status = EnumTool.messageStatusFromInt(GetSafetyValue(json, "status") as number);
     message?.setStatus(status);
     if(status == MessageStatus.SUCCESS) {
-      message?.setUnread(!(json.get("hasRead") as boolean));
+      message?.setUnread(!(GetSafetyValue(json, "hasRead") as boolean));
     }
     message?.setIsNeedGroupAck(GetSafetyValue(json, "needGroupAck"));
-    if(json.has("groupAckCount")) {
+    let count : number | undefined = GetSafetyValue(json, "groupAckCount");
+    if(count != undefined) {
       // TODO: 需要提供set方法
     }
     message?.deliverOnlineOnly(GetSafetyValue(json, "deliverOnlineOnly"));
     message?.setLocalTimestamp(GetSafetyValue(json, "localTime"));
-    if(json.has("serverTime")) {
-      message?.setServerTimestamp(GetSafetyValue(json, "serverTime"));
-    }
+    message?.setServerTimestamp(GetSafetyValue(json, "serverTime"));
     let priority: ChatroomMessagePriority | undefined = GetSafetyValue(json, "chatroomMessagePriority");
     if(priority != undefined) {
       message?.setPriority(priority);
     }
 
     message?.setMsgId(msgId);
-    if(json.has("attributes")) {
-      let attributes = json.get("attributes") as Map<string, Object>;
+    let attributes: Any = GetSafetyValue(json, "attributes");
+    if(IsObj(attributes)) {
       let ext = new Map<string, MessageExtType>();
-      attributes.forEach((v, k)=>{
-          if(typeof v === "number" || typeof v === "string" || typeof v === "boolean") {
-            ext.set(k, v);
-          }else if(v instanceof Object){
-            // TODO: 待验证
-            message?.setJsonAttribute(k, JSON.stringify(v));
-          }
-      });
+      let keys = Object.keys(attributes);
+      for (let index = 0; index < keys.length; index++) {
+        const k = keys[index];
+        const v = attributes[k] as object;
+        if(typeof v === "number" || typeof v === "string" || typeof v === "boolean") {
+          ext.set(k, v);
+        }else if(v instanceof Object){
+          // TODO: 待验证
+          message?.setJsonAttribute(k, JSON.stringify(v));
+        }
+      }
       if(ext.size != 0) {
         message?.setExt(ext);
       }

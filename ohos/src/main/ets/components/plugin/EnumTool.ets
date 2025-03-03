@@ -11,6 +11,7 @@ import {
   PushRemindType,
   MessageStatus,
 } from "@easemob/chatsdk";
+import { it } from "@ohos/hypium";
 
 // TODO: 待验证
 export default class EnumTool {
@@ -44,7 +45,7 @@ export default class EnumTool {
     return status;
   }
 
-  static downloadStatusFromInt(iStatus: number | undefined): DownloadStatus | undefined{
+  static downloadStatusFromInt(iStatus: number): DownloadStatus{
     return iStatus;
   }
 
@@ -52,7 +53,7 @@ export default class EnumTool {
     return type;
   }
 
-  static chatTypeFromInt(iType: number | undefined): ChatType | undefined{
+  static chatTypeFromInt(iType: number): ChatType{
     return iType;
   }
 

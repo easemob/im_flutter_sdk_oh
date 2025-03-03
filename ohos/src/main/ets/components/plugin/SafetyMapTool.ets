@@ -36,3 +36,18 @@ export function GetSafetyValue<T>(args: Any, key:string, defaultValue?: T): T | 
 export function IsObj (object: Object): boolean {
   return object && typeof (object) == 'object';
 }
+
+export function ObjToMap (obj: Any) : Map<string, string> {
+  let map = new Map<string, string>();
+  if(IsObj(obj)) {
+    let keys = Object.keys(obj);
+    for (let index = 0; index < keys.length; index++) {
+      const key = keys[index];
+      let v = obj[key] as object;
+      if(typeof v === "string") {
+        map.set(key, v);
+      }
+    }
+  }
+  return map;
+}
