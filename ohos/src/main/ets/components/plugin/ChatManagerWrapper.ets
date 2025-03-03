@@ -753,7 +753,7 @@ export default class ChatManagerWrapper extends Wrapper implements MethodCallHan
       return;
     }
 
-    let mark: MarkType | undefined = GetSafetyValue(json, "mark");
+    let mark: MarkType | undefined = GetSafetyValue(call.args, "mark");
     if(mark != undefined) {
       ChatClient.getInstance().chatManager()?.fetchConversationsFromServerWithFilter(ConversationFilterHelper.fromJson(call.args))
         .then((value)=>this.onSuccess(result, call.method, CursorResultHelper.toJson(value)))
