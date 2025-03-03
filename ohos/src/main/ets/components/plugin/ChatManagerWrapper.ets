@@ -19,6 +19,7 @@ import { ChatClient,
   ChatMessageReactionChange,
   ChatMessagePinInfo,
   PinOperation,
+  MarkType,
 } from "@easemob/chatsdk";
 import { FlutterPluginBinding, JSONMethodCodec,
   MethodCall,
@@ -42,6 +43,7 @@ import MessageHelper from "./models/MessageHelper";
 import RecallMessageInfoHelper from "./models/RecallMessageInfoHelper";
 import { GetSafetyValue } from "./SafetyMapTool";
 import Wrapper from "./Wrapper";
+import { EMClient } from "@easemob/chatsdk/src/main/cpp/types/libhyphenate/EMClient";
 
 export default class ChatManagerWrapper extends Wrapper implements MethodCallHandler {
   private messageChannel: MethodChannel;
@@ -743,13 +745,31 @@ export default class ChatManagerWrapper extends Wrapper implements MethodCallHan
       .catch((e: ChatError) => this.onError(result, e));
   }
   private fetchConversationsByOptions(call: MethodCall, result: MethodResult) {
-    ChatClient.getInstance().chatManager()?.fetchConversationsFromServerWithFilter(ConversationFilterHelper.fromJson(call.args))
+    let isPinned: boolean = GetSafetyValue(call.args, "pinned") ?? false;
+    if(isPinned) {
+      ChatClient.getInstance().chatManager()?.fetchPinnedConversationsFromServer(GetSafetyValue(call.args, "pageSize"), GetSafetyValue(call.args, "cursor"))
+        .then((value)=>this.onSuccess(result, call.method, CursorResultHelper.toJson(value)))
+        .catch((e: ChatError) => this.onError(result, e));
+      return;
+    }
+
+    let mark: MarkType | undefined = GetSafetyValue(json, "mark");
+    if(mark != undefined) {
+      ChatClient.getInstance().chatManager()?.fetchConversationsFromServerWithFilter(ConversationFilterHelper.fromJson(call.args))
+        .then((value)=>this.onSuccess(result, call.method, CursorResultHelper.toJson(value)))
+        .catch((e: ChatError) => this.onError(result, e));
+      return;
+    }
+
+    ChatClient.getInstance().chatManager()?.fetchConversationsFromServer(GetSafetyValue(call.args, "pageSize"), GetSafetyValue(call.args, "cursor"))
       .then((value)=>this.onSuccess(result, call.method, CursorResultHelper.toJson(value)))
       .catch((e: ChatError) => this.onError(result, e));
   }
+
   private deleteAllMessageAndConversation(call: MethodCall, result: MethodResult) {
     this.noSupport(result);
   }
+
   private pinMessage(call: MethodCall, result: MethodResult) {
     ChatClient.getInstance().chatManager()?.pinMessage(GetSafetyValue(call.args, "msgId"))
       .then(()=>this.onSuccess(result, call.method))
@@ -769,7 +789,8 @@ export default class ChatManagerWrapper extends Wrapper implements MethodCallHan
     this.noSupport(result);
   }
   private getMessageCount(call: MethodCall, result: MethodResult) {
-    let count = ChatClient.getInstance().chatManager()?.getDBMsgsCount();
-    this.onSuccess(result, call.method, count);
+    ChatClient.getInstance().chatManager()?.getDBMsgsCount()
+      .then((value)=>this.onSuccess(result, call.method, value))
+      .catch((e: ChatError) => this.onError(result, e));
   }
 }
