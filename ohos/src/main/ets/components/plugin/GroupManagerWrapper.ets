@@ -1,7 +1,7 @@
 import { ChatClient,
   ChatError, Group, GroupListener, SharedFile,
  } from "@easemob/chatsdk";
-import { FlutterPluginBinding,
+import { Any, FlutterPluginBinding,
   MethodCall,
   MethodCallHandler,
   MethodResult } from "@ohos/flutter_ohos";
@@ -11,6 +11,7 @@ import CursorResultHelper from "./models/CursorResultHelper";
 import GroupHelper from "./models/GroupHelper";
 import GroupOptionsHelper from "./models/GroupOptionsHelper";
 import SharedFileHelper from "./models/SharedFileHelper";
+import { IsObj, ObjToMap } from "./SafetyMapTool";
 import Wrapper from "./Wrapper";
 
 export default class GroupManagerWrapper extends Wrapper implements MethodCallHandler {
@@ -410,8 +411,11 @@ export default class GroupManagerWrapper extends Wrapper implements MethodCallHa
       .catch((e: ChatError) => this.onError(result, e));
   }
 
-  private getGroupSpecificationFromServer(_: MethodCall, result: MethodResult) {
-    this.noSupport(result);
+  private getGroupSpecificationFromServer(call: MethodCall, result: MethodResult) {
+    let groupId = call.argument("groupId") as string;
+    ChatClient.getInstance().groupManager()?.fetchGroupFromServer(groupId)
+      .then((value)=>this.onSuccess(result, call.method, GroupHelper.toJson(value)))
+      .catch((e: ChatError) => this.onError(result, e));
   }
   private getGroupMemberListFromServer(call: MethodCall, result: MethodResult) {
     let groupId = call.argument("groupId") as string;
@@ -616,16 +620,9 @@ export default class GroupManagerWrapper extends Wrapper implements MethodCallHa
     let groupId = call.argument("groupId") as string;
     let filePath = call.argument("filePath") as string;
     let weakRef = new WeakRef(this);
-    ChatClient.getInstance().groupManager()?.uploadGroupSharedFile(groupId, filePath, {
-      onSuccess(){
-        let retrievedObject = weakRef.deref();
-        retrievedObject?.onSuccess(result, call.method);
-      },
-      onError(code, desc){
-        let retrievedObject = weakRef.deref();
-        retrievedObject?.onErrorInfo(result, code, desc);
-      },
-    });
+    ChatClient.getInstance().groupManager()?.uploadGroupSharedFile(groupId, filePath)
+      .then((_)=>this.onSuccess(result, call.method, true))
+      .catch((e: ChatError) => this.onError(result, e));
   }
   private downloadGroupSharedFile(call: MethodCall, result: MethodResult) {
     let groupId = call.argument("groupId") as string;
@@ -727,7 +724,7 @@ export default class GroupManagerWrapper extends Wrapper implements MethodCallHa
   private setMemberAttributes(call: MethodCall, result: MethodResult) {
     let groupId = call.argument("groupId") as string;
     let userId = call.argument("userId") as string;
-    let map = call.argument("attributes") as Map<string, string>;
+    let map = ObjToMap(call.argument("attributes"))
     ChatClient.getInstance().groupManager()?.setMemberAttributes(groupId, userId, map)
       .then(()=>this.onSuccess(result, call.method))
       .catch((e: ChatError) => this.onError(result, e));
@@ -761,7 +758,7 @@ export default class GroupManagerWrapper extends Wrapper implements MethodCallHa
       userId = ChatClient.getInstance().getCurrentUser();
     }
     ChatClient.getInstance().groupManager()?.fetchMemberAttributes(groupId, userId)
-      .then((value)=>this.onSuccess(result, call.method, value.get(userId!)))
+      .then((value)=>this.onSuccess(result, call.method, value))
       .catch((e: ChatError) => this.onError(result, e));
   }
 
