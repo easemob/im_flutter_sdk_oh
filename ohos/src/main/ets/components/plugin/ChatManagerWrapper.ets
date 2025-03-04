@@ -409,11 +409,12 @@ export default class ChatManagerWrapper extends Wrapper implements MethodCallHan
     let msg = MessageHelper.fromJson(call.argument("message"));
     let dbMsg = ChatClient.getInstance().chatManager()?.getMessage(msg.getMsgId());
     if(!dbMsg) {
-      dbMsg = msg;
+      this.onSuccess(result, call.method, false);
+      return;
     }
     HelpTool.mergeMessage(msg, dbMsg);
     ChatClient.getInstance().chatManager()?.updateMessage(dbMsg);
-    this.onSuccess(result, call.method, MessageHelper.toJson(dbMsg));
+    this.onSuccess(result, call.method, true);
   }
 
   private downloadAttachment(call: MethodCall, result: MethodResult) {

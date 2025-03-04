@@ -89,7 +89,6 @@ export default class EnumTool {
     return iType;
   }
 
-
   static remindTypeToInt(type: PushRemindType): number{
     return type;
   }
