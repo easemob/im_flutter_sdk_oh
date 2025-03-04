@@ -118,6 +118,7 @@ export default class ContactManagerWrapper extends Wrapper implements MethodCall
       .then(() => this.onSuccess(result, call.method))
       .catch((e: ChatError) => this.onError(result, e));
   }
+
   private deleteContact(call: MethodCall, result: MethodResult) {
     let userId = call.argument("username") as string;
     let keepConversation = call.argument("keepConversation") as boolean;
@@ -125,23 +126,27 @@ export default class ContactManagerWrapper extends Wrapper implements MethodCall
       .then(() => this.onSuccess(result, call.method))
       .catch((e: ChatError) => this.onError(result, e));
   }
+
   private getAllContactsFromServer(call: MethodCall, result: MethodResult) {
     ChatClient.getInstance().contactManager()?.fetchAllContactsIDFromServer()
       .then(value=>this.onSuccess(result, call.method, value))
       .catch((e: ChatError) => this.onError(result, e));
 
   }
+
   private getAllContactsFromDB(call: MethodCall, result: MethodResult) {
     ChatClient.getInstance().contactManager()?.allContacts()
       .then(value=>this.onSuccess(result, call.method, value))
       .catch((e: ChatError) => this.onError(result, e));
   }
+
   private addUserToBlockList(call: MethodCall, result: MethodResult) {
     let userId = call.argument("username") as string;
     ChatClient.getInstance().contactManager()?.addUsersToBlocklist([userId])
       .then(() => this.onSuccess(result, call.method))
       .catch((e: ChatError) => this.onError(result, e));
   }
+
   private removeUserFromBlockList(call: MethodCall, result: MethodResult) {
     let userId = call.argument("username") as string;
     ChatClient.getInstance().contactManager()?.removeUserFromBlockList(userId)
@@ -154,6 +159,7 @@ export default class ContactManagerWrapper extends Wrapper implements MethodCall
       .then(value=>this.onSuccess(result, call.method, value))
       .catch((e: ChatError) => this.onError(result, e));
   }
+
   private getBlockListFromDB(call: MethodCall, result: MethodResult) {
     ChatClient.getInstance().contactManager()?.blockList()
       .then(value=>this.onSuccess(result, call.method, value))
@@ -176,9 +182,10 @@ export default class ContactManagerWrapper extends Wrapper implements MethodCall
 
   private getSelfIdsOnOtherPlatform(call: MethodCall, result: MethodResult) {
     ChatClient.getInstance().contactManager()?.getSelfIdsOnOtherPlatform()
-      .then(()=>this.onSuccess(result, call.method))
+      .then((value)=>this.onSuccess(result, call.method, value))
       .catch((e: ChatError) => this.onError(result, e));
   }
+
   private getAllContacts(call: MethodCall, result: MethodResult) {
     ChatClient.getInstance().contactManager()?.getContactsFromLocal()
       .then((value)=>this.onSuccess(result, call.method, ContactHelper.listToJson(value)))
