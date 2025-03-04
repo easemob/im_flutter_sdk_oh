@@ -97,11 +97,13 @@ export default class MessageHelper {
     message?.setIsNeedGroupAck(GetSafetyValue(json, "needGroupAck"));
     let count : number | undefined = GetSafetyValue(json, "groupAckCount");
     if(count != undefined) {
-      // TODO: 需要提供set方法
+      message?.setGroupAckCount(count);
     }
+    message?.setBroadcast(GetSafetyValue(json, "broadcast"))
     message?.deliverOnlineOnly(GetSafetyValue(json, "deliverOnlineOnly"));
     message?.setLocalTimestamp(GetSafetyValue(json, "localTime"));
     message?.setServerTimestamp(GetSafetyValue(json, "serverTime"));
+    message?.setDelivered(GetSafetyValue(json, "hasDeliverAck"));
     let priority: ChatroomMessagePriority | undefined = GetSafetyValue(json, "chatroomMessagePriority");
     if(priority != undefined) {
       message?.setPriority(priority);

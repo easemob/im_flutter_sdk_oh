@@ -62,6 +62,7 @@ export default class ChatManagerWrapper extends Wrapper implements MethodCallHan
         retrievedObject?.channel?.invokeMethod(MethodKey.onMessagesReceived, MessageHelper.listToJson(messages));
       },
       onCmdMessageReceived(messages: ChatMessage[]){
+3
         let retrievedObject = weakRef.deref();
         retrievedObject?.channel?.invokeMethod(MethodKey.onCmdMessagesReceived, MessageHelper.listToJson(messages));
       },
