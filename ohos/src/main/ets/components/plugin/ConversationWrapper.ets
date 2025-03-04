@@ -447,7 +447,7 @@ export default class ConversationWrapper extends Wrapper implements MethodCallHa
   private searchMsgByOptions(call: MethodCall, result: MethodResult) {
     let conversation = this.conversationWithParam(call);
     if (conversation) {
-      let timestamp = call.argument('timestamp') as number;
+      let timestamp = call.argument('ts') as number;
       let maxCount = call.argument('count') as number;
       let from = '';
       if (call.hasArgument('from')) {
