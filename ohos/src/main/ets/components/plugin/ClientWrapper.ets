@@ -1,6 +1,4 @@
-import { ChatClient, ChatError, ConnectionListener,
-  ConversationType,
-  MultiDevicesEvent, MultiDevicesListener } from '@easemob/chatsdk';
+import { ChatClient, ChatError, ConnectionListener, MultiDevicesListener } from '@easemob/chatsdk';
 import { FlutterPluginBinding, MethodCall, MethodResult } from '@ohos/flutter_ohos';
 import ChatManagerWrapper from './ChatManagerWrapper';
 import ChatRoomManagerWrapper from './ChatRoomManagerWrapper';

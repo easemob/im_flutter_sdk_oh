@@ -1,4 +1,4 @@
-import { ChatMessageReaction, ChatMessageReactionChange } from "@easemob/chatsdk";
+import { ChatMessageReactionChange } from "@easemob/chatsdk";
 import { SafetyValue } from "../SafetyMapTool";
 import ChatMessageReactionHelper from "./ChatMessageReactionHelper";
 import ChatMessageReactionOperationHelper from "./ChatMessageReactionOperationHelper";

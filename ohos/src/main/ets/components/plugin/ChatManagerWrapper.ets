@@ -12,7 +12,6 @@ import { ChatClient,
   ChatError,
   FetchMessageOption,
   SearchDirection,
-  ChatType,
   FetchReactionDetailParams,
   RecallMessageInfo,
   GroupReadAck,
@@ -43,7 +42,6 @@ import MessageHelper from "./models/MessageHelper";
 import RecallMessageInfoHelper from "./models/RecallMessageInfoHelper";
 import { GetSafetyValue } from "./SafetyMapTool";
 import Wrapper from "./Wrapper";
-import { EMClient } from "@easemob/chatsdk/src/main/cpp/types/libhyphenate/EMClient";
 
 export default class ChatManagerWrapper extends Wrapper implements MethodCallHandler {
   private messageChannel: MethodChannel;
@@ -560,7 +558,7 @@ export default class ChatManagerWrapper extends Wrapper implements MethodCallHan
     this.onSuccess(result, call.method, ConversationHelper.listToJson(conversations));
   }
 
-  private getConversationsFromServer(call: MethodCall, result: MethodResult) {
+  private getConversationsFromServer(_: MethodCall, result: MethodResult) {
     this.noSupport(result);
   }
 
@@ -571,7 +569,7 @@ export default class ChatManagerWrapper extends Wrapper implements MethodCallHan
     this.onSuccess(result, call.method, succeed)
   }
 
-  private fetchHistoryMessages(call: MethodCall, result: MethodResult) {
+  private fetchHistoryMessages(_: MethodCall, result: MethodResult) {
     this.noSupport(result);
   }
 
@@ -622,15 +620,15 @@ export default class ChatManagerWrapper extends Wrapper implements MethodCallHan
       .catch((e: ChatError) => this.onError(result, e));
   }
 
-  private deleteMessagesBefore(call: MethodCall, result: MethodResult) {
+  private deleteMessagesBefore(_: MethodCall, result: MethodResult) {
     this.noSupport(result);
   }
 
-  private translateMessage(call: MethodCall, result: MethodResult) {
+  private translateMessage(_: MethodCall, result: MethodResult) {
     this.noSupport(result);
   }
 
-  private fetchSupportedLanguages(call: MethodCall, result: MethodResult) {
+  private fetchSupportedLanguages(_: MethodCall, result: MethodResult) {
     this.noSupport(result);
   }
 
@@ -664,6 +662,7 @@ export default class ChatManagerWrapper extends Wrapper implements MethodCallHan
       })
       .catch((e: ChatError) => this.onError(result, e));
   }
+
   private fetchReactionDetail(call: MethodCall, result: MethodResult) {
     let params = new FetchReactionDetailParams();
     params.messageId = GetSafetyValue(call.args, "msgId") ?? "";
@@ -674,12 +673,15 @@ export default class ChatManagerWrapper extends Wrapper implements MethodCallHan
       .then((value)=>this.onSuccess(result, call.method, CursorResultHelper.toJson(value)))
       .catch((e: ChatError) => this.onError(result, e));
   }
-  private reportMessage(call: MethodCall, result: MethodResult) {
+
+  private reportMessage(_: MethodCall, result: MethodResult) {
     this.noSupport(result);
   }
-  private getConversationsFromServerWithPage(call: MethodCall, result: MethodResult) {
+
+  private getConversationsFromServerWithPage(_: MethodCall, result: MethodResult) {
     this.noSupport(result);
   }
+
   private removeMessagesFromServerWithMsgIds(call: MethodCall, result: MethodResult) {
     ChatClient.getInstance().chatManager()?.removeMessagesFromServer(
       GetSafetyValue(call.args, "convId"),
@@ -689,9 +691,11 @@ export default class ChatManagerWrapper extends Wrapper implements MethodCallHan
       .then(()=>this.onSuccess(result, call.method))
       .catch((e: ChatError) => this.onError(result, e));
   }
-  private removeMessagesFromServerWithTs(call: MethodCall, result: MethodResult) {
+
+  private removeMessagesFromServerWithTs(_: MethodCall, result: MethodResult) {
     this.noSupport(result);
   }
+
   private getConversationsFromServerWithCursor(call: MethodCall, result: MethodResult) {
     ChatClient.getInstance().chatManager()?.fetchConversationsFromServer(
       GetSafetyValue(call.args, "pageSize"),
@@ -700,6 +704,7 @@ export default class ChatManagerWrapper extends Wrapper implements MethodCallHan
       .then((value)=>this.onSuccess(result, call.method, CursorResultHelper.toJson(value)))
       .catch((e: ChatError) => this.onError(result, e));
   }
+
   private getPinnedConversationsFromServerWithCursor(call: MethodCall, result: MethodResult) {
     ChatClient.getInstance().chatManager()?.fetchPinnedConversationsFromServer(
       GetSafetyValue(call.args, "pageSize"),
@@ -708,6 +713,7 @@ export default class ChatManagerWrapper extends Wrapper implements MethodCallHan
       .then((value)=>this.onSuccess(result, call.method, CursorResultHelper.toJson(value)))
       .catch((e: ChatError) => this.onError(result, e));
   }
+
   private pinConversation(call: MethodCall, result: MethodResult) {
     ChatClient.getInstance().chatManager()?.pinConversation(
       GetSafetyValue(call.args, "convId"),
@@ -716,6 +722,7 @@ export default class ChatManagerWrapper extends Wrapper implements MethodCallHan
       .then(()=>this.onSuccess(result, call.method))
       .catch((e: ChatError) => this.onError(result, e));
   }
+
   private modifyMessage(call: MethodCall, result: MethodResult) {
     ChatClient.getInstance().chatManager()?.modifyMessage(
       GetSafetyValue(call.args, "msgId"),
@@ -731,6 +738,7 @@ export default class ChatManagerWrapper extends Wrapper implements MethodCallHan
       .then((value)=>this.onSuccess(result, call.method, MessageHelper.listToJson(value)))
       .catch((e: ChatError) => this.onError(result, e));
   }
+
   private addRemoteAndLocalConversationsMark(call: MethodCall, result: MethodResult) {
     let convIds: Array<string> = GetSafetyValue(call.args, "convIds")!;
     let mark: number = GetSafetyValue(call.args, "mark")!;
@@ -738,6 +746,7 @@ export default class ChatManagerWrapper extends Wrapper implements MethodCallHan
       .then(()=>this.onSuccess(result, call.method))
       .catch((e: ChatError) => this.onError(result, e));
   }
+
   private deleteRemoteAndLocalConversationsMark(call: MethodCall, result: MethodResult) {
     let convIds: Array<string> = GetSafetyValue(call.args, "convIds")!;
     let mark: number = GetSafetyValue(call.args, "mark")!;
@@ -745,6 +754,7 @@ export default class ChatManagerWrapper extends Wrapper implements MethodCallHan
       .then(()=>this.onSuccess(result, call.method))
       .catch((e: ChatError) => this.onError(result, e));
   }
+
   private fetchConversationsByOptions(call: MethodCall, result: MethodResult) {
     let isPinned: boolean = GetSafetyValue(call.args, "pinned") ?? false;
     if(isPinned) {
@@ -767,7 +777,7 @@ export default class ChatManagerWrapper extends Wrapper implements MethodCallHan
       .catch((e: ChatError) => this.onError(result, e));
   }
 
-  private deleteAllMessageAndConversation(call: MethodCall, result: MethodResult) {
+  private deleteAllMessageAndConversation(_: MethodCall, result: MethodResult) {
     this.noSupport(result);
   }
 
@@ -776,19 +786,23 @@ export default class ChatManagerWrapper extends Wrapper implements MethodCallHan
       .then(()=>this.onSuccess(result, call.method))
       .catch((e: ChatError) => this.onError(result, e));
   }
+
   private unpinMessage(call: MethodCall, result: MethodResult) {
     ChatClient.getInstance().chatManager()?.unpinMessage(GetSafetyValue(call.args, "msgId"))
       .then(()=>this.onSuccess(result, call.method))
       .catch((e: ChatError) => this.onError(result, e));
   }
+
   private fetchPinnedMessages(call: MethodCall, result: MethodResult) {
     ChatClient.getInstance().chatManager()?.fetchPinnedMessagesFromServer(GetSafetyValue(call.args, "convId"))
       .then((value)=>this.onSuccess(result, call.method, MessageHelper.listToJson(value)))
       .catch((e: ChatError) => this.onError(result, e));
   }
-  private searchMsgByOptions(call: MethodCall, result: MethodResult) {
+
+  private searchMsgByOptions(_: MethodCall, result: MethodResult) {
     this.noSupport(result);
   }
+
   private getMessageCount(call: MethodCall, result: MethodResult) {
     ChatClient.getInstance().chatManager()?.getDBMsgsCount()
       .then((value)=>this.onSuccess(result, call.method, value))

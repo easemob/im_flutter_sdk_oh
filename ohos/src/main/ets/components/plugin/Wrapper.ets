@@ -1,8 +1,8 @@
 import {
   FlutterPluginBinding,
   JSONMethodCodec,
-  MethodCall, MethodCallHandler, MethodChannel, MethodResult,
-  StandardMethodCodec } from "@ohos/flutter_ohos";
+  MethodCall, MethodCallHandler, MethodChannel, MethodResult
+} from "@ohos/flutter_ohos";
 import { common } from "@kit.AbilityKit";
 import { ChatError } from "@easemob/chatsdk";
 import ChatErrorHelper from "./models/ChatErrorHelper";
@@ -23,10 +23,9 @@ export default class Wrapper implements  MethodCallHandler{
     this.registerEaseListener();
   }
 
-
   public onSuccess(result: MethodResult, method: string, object?: Object | null): void {
     let map = new Map<string, Object>();
-    if(object !== null && object !== undefined) {
+    if(object) {
       map.set(method, object);
     }
     result.success(map);
@@ -46,6 +45,7 @@ export default class Wrapper implements  MethodCallHandler{
 
   public noSupport(result: MethodResult) {
     result.notImplemented();
+    throw Error();
   }
 
   public registerEaseListener() {}

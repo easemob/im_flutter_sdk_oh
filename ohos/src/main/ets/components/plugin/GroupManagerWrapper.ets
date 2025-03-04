@@ -358,8 +358,7 @@ export default class GroupManagerWrapper extends Wrapper implements MethodCallHa
       this.clearAllGroupsFromDB(call, result);
     } else if (MethodKey.isMemberInGroupMuteList == call.method) {
       this.isMemberInGroupMuteList(call, result);
-    }
-    else {
+    } else {
       super.onMethodCall(call, result);
     }
   }
