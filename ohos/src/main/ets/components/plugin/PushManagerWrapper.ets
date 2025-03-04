@@ -126,10 +126,10 @@ export default class PushManagerWrapper extends Wrapper implements MethodCallHan
   setConversationSilentMode(call: MethodCall, result: MethodResult) {
     const conversationId = call.argument('conversationId') as string;
     const type = call.argument('conversationType') as ConversationType;
-    const param = SilentModeParamHelper.fromJson(call.argument('param') as Map<string, object>) as PushRemindType;
+    const param = SilentModeParamHelper.fromJson(call.argument('param')) as PushRemindType;
     ChatClient.getInstance().pushManager()?.setSilentModeForConversation(conversationId, type, param)
-      .then(() => {
-        this.onSuccess(result, call.method);
+      .then((r) => {
+        this.onSuccess(result, call.method, SilentModeResultHelper.toJson(r));
       })
       .catch((e: ChatError) => {
         this.onError(result, e);
@@ -161,10 +161,10 @@ export default class PushManagerWrapper extends Wrapper implements MethodCallHan
   }
 
   setSilentModeForAll(call: MethodCall, result: MethodResult) {
-    const param = SilentModeParamHelper.fromJson(call.argument('param') as Map<string, object>);
+    const param = SilentModeParamHelper.fromJson(call.argument('param'));
     ChatClient.getInstance().pushManager()?.setSilentModeForAll(param)
-      .then(() => {
-        this.onSuccess(result, call.method);
+      .then((r) => {
+        this.onSuccess(result, call.method, SilentModeResultHelper.toJson(r));
       })
       .catch((e: ChatError) => {
         this.onError(result, e);

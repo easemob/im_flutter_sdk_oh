@@ -2,23 +2,40 @@ import { PushRemindType, SilentModeParam, SilentModeResult,
   SilentModeTime,
   SilentModeTimeParam } from "@easemob/chatsdk";
 import { Any, ToolUtils } from "@ohos/flutter_ohos";
+import { GetSafetyValue } from "../SafetyMapTool";
 
 export class SilentModeParamHelper {
 
-  static fromJson(json: Map<string, object>): SilentModeParam {
-    if (json.has('remindType')) {
-      let remindType = json.get('remindType');
-      if (typeof remindType === 'number') {
-        return remindType as PushRemindType;
+  static fromJson(json: Map<string, object> | object): SilentModeParam {
+    if (ToolUtils.isObj(json)) {
+      let keys = Object.keys(json);
+      if (keys.includes('remindType')) {
+        let remindType = GetSafetyValue(json, 'remindType', PushRemindType.ALL)
+        return remindType ?? PushRemindType.ALL;
       }
-      return PushRemindType.ALL;
-    }
-    if (json.has('startTime') && json.has('endTime')) {
-      let startTime = SilentModeTimeHelper.fromJson(json.get('startTime'));
-      let endTime = SilentModeTimeHelper.fromJson(json.get('endTime'));
-      return {
-        startTime: startTime,
-        endTime: endTime
+      if (keys.includes('startTime') && keys.includes('endTime')) {
+        let startTime = SilentModeTimeHelper.fromJson(GetSafetyValue(json, 'startTime'));
+        let endTime = SilentModeTimeHelper.fromJson(GetSafetyValue(json, 'endTime'));
+        return {
+          startTime: startTime,
+          endTime: endTime
+        }
+      }
+    } else if (json instanceof Map){
+      if (json.has('remindType')) {
+        let remindType = json.get('remindType');
+        if (typeof remindType === 'number') {
+          return remindType as PushRemindType;
+        }
+        return PushRemindType.ALL;
+      }
+      if (json.has('startTime') && json.has('endTime')) {
+        let startTime = SilentModeTimeHelper.fromJson(json.get('startTime'));
+        let endTime = SilentModeTimeHelper.fromJson(json.get('endTime'));
+        return {
+          startTime: startTime,
+          endTime: endTime
+        }
       }
     }
     return PushRemindType.ALL;
@@ -77,6 +94,6 @@ export class SilentModeResultHelper {
     if (result.getRemindType() !== undefined) {
       data.set('remindType', result.getRemindType() as number);
     }
-    return new Map();
+    return data;
   }
 }
