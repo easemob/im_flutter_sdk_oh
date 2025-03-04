@@ -26,7 +26,7 @@ export default class Wrapper implements  MethodCallHandler{
 
   public onSuccess(result: MethodResult, method: string, object?: Object | null): void {
     let map = new Map<string, Object>();
-    if(object) {
+    if(object !== null && object !== undefined) {
       map.set(method, object);
     }
     result.success(map);
