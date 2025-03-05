@@ -76,8 +76,13 @@ export default class PresenceManagerWrapper extends Wrapper implements MethodCal
     this.listener = {
       onPresenceUpdated(presences: Array<Presence>):void {
         let retrievedObject = weakRef.deref();
-        const list = presences.map(presence => PresenceHelper.toJson(presence));
-        retrievedObject?.channel?.invokeMethod(MethodKey.onPresenceStatusChanged, list);
+        let data: Map<string, object> = new Map();
+        const list: Map<string, object>[] = [];
+        presences.forEach(presence => {
+          list.push(PresenceHelper.toJson(presence));
+        })
+        data.set('presences', list);
+        retrievedObject?.channel?.invokeMethod(MethodKey.onPresenceStatusChanged, data);
       }
     };
     ChatClient.getInstance().presenceManager()?.addListener(this.listener);
