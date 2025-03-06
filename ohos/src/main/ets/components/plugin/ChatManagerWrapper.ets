@@ -400,8 +400,16 @@ export default class ChatManagerWrapper extends Wrapper implements MethodCallHan
     this.onSuccess(result, call.method);
   }
 
-  private getUnreadMessageCount(_: MethodCall, result: MethodResult) {
-    this.noSupport(result);
+  private getUnreadMessageCount(call: MethodCall, result: MethodResult) {
+    let conversations =  ChatClient.getInstance().chatManager()?.getAllConversationsBySort();
+    let count: number = 0;
+    if(conversations != undefined) {
+      for (let index = 0; index < conversations.length; index++) {
+        const element = conversations[index];
+        count += element.getUnreadMsgCount();
+      }
+    }
+    this.onSuccess(result, call.method, count);
   }
 
   private updateChatMessage(call: MethodCall, result: MethodResult) {
@@ -778,7 +786,9 @@ export default class ChatManagerWrapper extends Wrapper implements MethodCallHan
       .catch((e: ChatError) => this.onError(result, e));
   }
 
-  private deleteAllMessageAndConversation(_: MethodCall, result: MethodResult) {
+  private deleteAllMessageAndConversation(call: MethodCall, result: MethodResult) {
+    let clearServerData : boolean | undefined = GetSafetyValue(call.args, "clearServerData", false);
+    ChatClient.getInstance().chatManager()?.deleteAllConversationsAndMessages(clearServerData);
     this.noSupport(result);
   }
 
