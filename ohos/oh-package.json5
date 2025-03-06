@@ -7,6 +7,6 @@
   "license": "Apache-2.0",
   "dependencies": {
     "@ohos/flutter_ohos": "file:./har/flutter.har",
-    "@easemob/chatsdk": "file:./libs/chatsdk-1.5.2-beta.2.har"
+    "@easemob/chatsdk": "file:./libs/chatsdk-1.5.2.har"
   }
 }
