@@ -18,7 +18,7 @@ flutter create  --platforms=ohos .
 flutter create  --platforms=ohos . --org="xxx.xxx"
 ```
 
-其中 `xxx.xxx` 为您 or g的名称。
+其中 `xxx.xxx` 为您 org 的名称。
 
 
 ### 新建支持鸿蒙的项目
