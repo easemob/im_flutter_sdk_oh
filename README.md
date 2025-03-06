@@ -4,6 +4,7 @@
 
 [flutter 鸿蒙支持环境搭建](https://gitee.com/harmonycommando_flutter/flutter)
 
+
 ### 向已存在的项目中添加鸿蒙支持
 
 需要先进入到项目中，之后执行命令
@@ -38,10 +39,40 @@ im_flutter_sdk:
         ref: "main"
 ```
 
+#### 修改 useNormalizedOHMUrl 模式
+
+因为 环信 sdk 只支持 useNormalizedOHMUrl模式，最需要在你的项目中配置 useNormalizedOHMUrl 为 `true`
+
+打开 `app/ohos/build-profile.json5` 文件，找到 `app:products:`, 并向其中添加 `buildOption`
+
+```json
+"products": [
+  {
+    "name": "default",
+    "signingConfig": "default",
+    "compatibleSdkVersion": "5.0.0(12)",
+    "runtimeOS": "HarmonyOS",
+    // 添加内容
+    "buildOption": {
+      "strictMode": {
+        "useNormalizedOHMUrl": true
+      }
+    }
+  }
+]
+```
+
+
 运行项目时需要先 build hap包。 执行
 ```shell
 flutter build hap --debug
 ```
+
+目前 flutter 社区版框架不支持 floatingActionButton，如果需要运行项目，要删除 floatingActionButton。
+同时，如果是模拟器运行，需要关闭 `impeller`,
+关闭方法参考 [常见问题](https://gitee.com/harmonycommando_flutter/flutter#%E5%B8%B8%E8%A7%81%E9%97%AE%E9%A2%98)
+
+
 
 ### 打包
 
