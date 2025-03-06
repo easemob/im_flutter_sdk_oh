@@ -246,8 +246,10 @@ export default class ConversationWrapper extends Wrapper implements MethodCallHa
         if (dbMsg) {
           HelpTool.mergeMessage(message, dbMsg);
           conversation.updateMessage(dbMsg);
+          this.onSuccess(result, call.method, true);
+        }else {
+          this.onSuccess(result, call.method, false);
         }
-        this.onSuccess(result, call.method, true);
       }
     } else {
       this.onError(result, ChatError.createError(ChatError.INVALID_PARAM, 'Conversation is undefined!'));
