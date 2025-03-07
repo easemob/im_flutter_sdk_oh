@@ -41,18 +41,6 @@
           ]
         }
       ]
-    },
-    {
-      "name": "im_flutter_sdk",
-      "srcPath": "../../ohos",
-      "targets": [
-        {
-          "name": "default",
-          "applyToProducts": [
-            "default"
-          ]
-        }
-      ]
     }
   ]
 }
