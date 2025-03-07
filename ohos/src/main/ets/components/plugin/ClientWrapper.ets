@@ -386,8 +386,8 @@ export default class ClientWrapper extends Wrapper {
     this.onSuccess(result, call.method, token);
   }
 
-  private isConnected(_: MethodCall, result: MethodResult) {
-    this.noSupport(result);
+  private isConnected(call: MethodCall, result: MethodResult) {
+    this.onSuccess(result, call.method, ChatClient.getInstance().isConnected());
   }
 
   private renewToken(call: MethodCall, result: MethodResult) {
