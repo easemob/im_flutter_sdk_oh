@@ -29,6 +29,9 @@ class EMPushConfig {
   bool enableHonorPush = false;
   bool enableAPNS = false;
 
+  String ohosPushAppId = '';
+  bool enableOhOSPush = false;
+
   EMPushConfig();
 
   void updateFromJson(Map<String, dynamic> json) {
@@ -70,6 +73,8 @@ class EMPushConfig {
     data.putIfNotNull('agreePrivacyStatement', agreePrivacyStatement);
     data.putIfNotNull("enableAPNS", enableAPNS);
     data.putIfNotNull("enableHonorPush", enableHonorPush);
+    data.putIfNotNull('enableOhOSPush', enableOhOSPush);
+    data.putIfNotNull('ohosPushAppId', ohosPushAppId);
 
     return data;
   }

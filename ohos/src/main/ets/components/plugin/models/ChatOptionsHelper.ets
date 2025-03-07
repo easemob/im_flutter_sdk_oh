@@ -1,5 +1,10 @@
 import { ChatOptions } from "@easemob/chatsdk";
-import { GetSafetyValue } from "../SafetyMapTool";
+import { Any } from "@ohos/flutter_ohos";
+import { GetSafetyValue, IsObj, ObjToMap } from "../SafetyMapTool";
+
+class ExtSettings {
+  static kAppIDForOhOS = "appIDForOhOS";
+}
 
 export default class ChatOptionsHelper {
   static fromJson(param: Map <string, Object>): ChatOptions {
@@ -34,6 +39,15 @@ export default class ChatOptionsHelper {
     options.setEnableTLSConnection(GetSafetyValue(param, "enableTLS"));
     options.setUseReplacedMessageContents(GetSafetyValue(param, "useReplacedMessageContents"));
     options.setIncludeSendMessageInMessageListener(GetSafetyValue(param, "messagesReceiveCallbackIncludeSend"));
+
+    let extSettings: Any = GetSafetyValue(param, "extSettings");
+    if(IsObj(extSettings)) {
+      let map =  ObjToMap(extSettings);
+      if(map.has(ExtSettings.kAppIDForOhOS)) {
+        let appId = map.get(ExtSettings.kAppIDForOhOS);
+        options.setAppIDForPush(GetSafetyValue(map, ExtSettings.kAppIDForOhOS));
+      }
+    }
 
     // TODO
     // options.setAppIDForPush(param.get("dnsUrl") as string);

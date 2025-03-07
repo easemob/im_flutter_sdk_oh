@@ -9,14 +9,6 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   assert(appKey.isNotEmpty, "appKey is empty");
 
-  EMOptions options = EMOptions.withAppKey(
-    appKey,
-    autoLogin: false,
-    debugMode: true,
-    usingHttpsOnly: false,
-  );
-
-  await EMClient.getInstance.init(options);
   runApp(const MyApp());
 }
 
@@ -56,6 +48,17 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   void initState() {
     super.initState();
+  }
+
+  void init() async {
+    EMOptions options = EMOptions.withAppKey(
+      appKey,
+      autoLogin: false,
+      debugMode: true,
+      usingHttpsOnly: false,
+    );
+
+    await EMClient.getInstance.init(options);
     _addChatListener();
   }
 
@@ -291,21 +294,20 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   void _signUp() async {
-    await EMClient.getInstance
-        .changeAppId(newAppId: '2e597744c44e4eed9b7c7c64e2ba2874');
+    init();
+    return;
+    if (_userId.isEmpty || _password.isEmpty) {
+      _addLogToConsole("username or password is null");
+      return;
+    }
 
-    // if (_userId.isEmpty || _password.isEmpty) {
-    //   _addLogToConsole("username or password is null");
-    //   return;
-    // }
-
-    // try {
-    //   _addLogToConsole("sign up...");
-    //   await EMClient.getInstance.createAccount(_userId, _password);
-    //   _addLogToConsole("sign up succeed, username: $_userId");
-    // } on EMError catch (e) {
-    //   _addLogToConsole("sign up failed, e: ${e.code} , ${e.description}");
-    // }
+    try {
+      _addLogToConsole("sign up...");
+      await EMClient.getInstance.createAccount(_userId, _password);
+      _addLogToConsole("sign up succeed, username: $_userId");
+    } on EMError catch (e) {
+      _addLogToConsole("sign up failed, e: ${e.code} , ${e.description}");
+    }
   }
 
   void _sendMessage() async {

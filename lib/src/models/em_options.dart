@@ -1,3 +1,5 @@
+import 'dart:io';
+import 'package:flutter/services.dart';
 import '../internal/inner_headers.dart';
 
 /// ~english
@@ -373,6 +375,8 @@ class EMOptions {
   ///
   final bool workPathCopiable;
 
+  final Map<String, String>? _extSettings;
+
   EMPushConfig _pushConfig = EMPushConfig();
 
   @Deprecated('Use [EMPushManager.bindDeviceToken] instead.')
@@ -396,6 +400,15 @@ class EMOptions {
     _pushConfig.enableOppoPush = true;
     _pushConfig.oppoAppKey = appKey;
     _pushConfig.oppoAppSecret = secret;
+  }
+
+  void enableOhOSPush(String appIDForPush) {
+    if (Platform.isAndroid || Platform.isIOS) {
+      throw MissingPluginException('enableOhOSPush is only available on OhOS');
+    }
+
+    _pushConfig.ohosPushAppId = appIDForPush;
+    _pushConfig.enableOhOSPush = true;
   }
 
   @Deprecated('Use [EMPushManager.bindDeviceToken] instead.')
@@ -735,6 +748,7 @@ class EMOptions {
     bool regardImportMessagesAsRead = false,
     bool workPathCopiable = false,
     String? loginExtension,
+    Map<String, String>? extSettings,
   }) : this._(
           appId: appId,
           autoLogin: autoLogin,
@@ -766,6 +780,7 @@ class EMOptions {
           regardImportMessagesAsRead: regardImportMessagesAsRead,
           workPathCopiable: workPathCopiable,
           loginExtension: loginExtension,
+          extSettings: extSettings,
         );
 
   /// ~english
@@ -988,6 +1003,7 @@ class EMOptions {
     bool regardImportMessagesAsRead = false,
     bool workPathCopiable = false,
     String? loginExtension,
+    Map<String, String>? extSettings,
   }) : this._(
           appKey: appKey,
           autoLogin: autoLogin,
@@ -1019,6 +1035,7 @@ class EMOptions {
           regardImportMessagesAsRead: regardImportMessagesAsRead,
           workPathCopiable: workPathCopiable,
           loginExtension: loginExtension,
+          extSettings: extSettings,
         );
 
   @Deprecated('Use [EMOptions.withAppKey] instead.')
@@ -1307,7 +1324,8 @@ class EMOptions {
     this.regardImportMessagesAsRead = false,
     this.workPathCopiable = false,
     this.loginExtension,
-  });
+    Map<String, String>? extSettings,
+  }) : _extSettings = extSettings;
 
   Map toJson() {
     Map data = new Map();
@@ -1348,6 +1366,7 @@ class EMOptions {
     data["usingHttpsOnly"] = this.usingHttpsOnly;
     data["pushConfig"] = this._pushConfig.toJson();
     data["areaCode"] = this.chatAreaCode;
+    data["extSettings"] = this._extSettings;
 
     // 481
     data.putIfNotNull('loginExtensionInfo', loginExtension);
@@ -1388,6 +1407,7 @@ class EMOptions {
     bool? sortMessageByServerTime,
     bool? messagesReceiveCallbackIncludeSend,
     bool? regardImportMessagesAsRead,
+    Map<String, String>? extSettings,
   }) {
     return EMOptions._(
       appKey: appKey,
@@ -1428,6 +1448,11 @@ class EMOptions {
       regardImportMessagesAsRead:
           regardImportMessagesAsRead ?? this.regardImportMessagesAsRead,
       loginExtension: loginExtension,
+      extSettings: extSettings,
     );
   }
+}
+
+class ExtSettings {
+  static String kAppIDForOhOS = 'appIDForOhOS';
 }
