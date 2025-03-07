@@ -387,7 +387,7 @@ export default class ClientWrapper extends Wrapper {
   }
 
   private isConnected(_: MethodCall, result: MethodResult) {
-    result?.notImplemented();
+    this.noSupport(result);
   }
 
   private renewToken(call: MethodCall, result: MethodResult) {
@@ -398,7 +398,7 @@ export default class ClientWrapper extends Wrapper {
   }
 
   private startCallback(call: MethodCall, result: MethodResult) {
-    // TODO:
+    this.onSuccess(result, call.method);
   }
 
   private updateUsingHttpsOnlySetting(call: MethodCall, result: MethodResult) {
