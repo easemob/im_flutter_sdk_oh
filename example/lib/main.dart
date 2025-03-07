@@ -48,6 +48,7 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   void initState() {
     super.initState();
+    init();
   }
 
   void init() async {
@@ -294,8 +295,6 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   void _signUp() async {
-    init();
-    return;
     if (_userId.isEmpty || _password.isEmpty) {
       _addLogToConsole("username or password is null");
       return;

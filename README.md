@@ -72,8 +72,23 @@ flutter build hap --debug
 同时，如果是模拟器运行，需要关闭 `impeller`,
 关闭方法参考 [常见问题](https://gitee.com/harmonycommando_flutter/flutter#%E5%B8%B8%E8%A7%81%E9%97%AE%E9%A2%98)
 
-
-
 ### 打包
 
 项目打包执行 `flutter build hap --release`
+
+
+
+### 常见问题
+
+1. 在sdk初始化时增加类华为appId的传参，调用后会把appID传给鸿蒙im sdk，以便它去获取推送和绑定deviceToken。调用方式：
+
+```dart
+EMOptions options = EMOptions.withAppKey(
+    appKey,
+    extSettings: {
+      ExtSettings.kAppIDForOhOS: "",
+    },
+);
+```
+
+调用后sdk会自动获取deviceToken和绑定，不需要flutter层再去调用 bindDeviceToken方法了， 当然，bindDeviceToken方法依然可用，如果不想使用以上方法，可以调用bindDeviceToken。
