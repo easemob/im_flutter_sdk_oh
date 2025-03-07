@@ -386,8 +386,8 @@ export default class ClientWrapper extends Wrapper {
     this.onSuccess(result, call.method, token);
   }
 
-  private isConnected(_: MethodCall, result: MethodResult) {
-    result?.notImplemented();
+  private isConnected(call: MethodCall, result: MethodResult) {
+    this.onSuccess(result, call.method, ChatClient.getInstance().isConnected());
   }
 
   private renewToken(call: MethodCall, result: MethodResult) {
@@ -398,7 +398,7 @@ export default class ClientWrapper extends Wrapper {
   }
 
   private startCallback(call: MethodCall, result: MethodResult) {
-    // TODO:
+    this.onSuccess(result, call.method);
   }
 
   private updateUsingHttpsOnlySetting(call: MethodCall, result: MethodResult) {
