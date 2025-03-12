@@ -1,7 +1,6 @@
 import {
   ChatClient,
-  ChatError,
-  ContactListener } from "@easemob/chatsdk";
+  ChatError, Contact, ContactListener } from "@easemob/chatsdk";
 import { FlutterPluginBinding,
   MethodCall,
   MethodCallHandler,
@@ -200,7 +199,24 @@ export default class ContactManagerWrapper extends Wrapper implements MethodCall
   }
 
   private getContact(call: MethodCall, result: MethodResult) {
-    this.noSupport(result);
+    let userId = call.argument("userId") as string;
+    ChatClient.getInstance().contactManager()?.getContactsFromLocal()
+      .then((value)=>{
+        let contact: Contact | undefined;
+        for (let index = 0; index < value.length; index++) {
+          const element = value[index];
+          if(element.userId() == userId) {
+            contact = element;
+            break;
+          }
+        }
+        if(contact != undefined) {
+          this.onSuccess(result, call.method, ContactHelper.toJson(contact));
+        }else {
+          this.onSuccess(result, call.method);
+        }
+      })
+      .catch((e: ChatError) => this.onError(result, e));
   }
 
   private fetchAllContacts(call: MethodCall, result: MethodResult) {
