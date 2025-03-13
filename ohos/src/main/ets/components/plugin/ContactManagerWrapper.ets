@@ -200,18 +200,10 @@ export default class ContactManagerWrapper extends Wrapper implements MethodCall
 
   private getContact(call: MethodCall, result: MethodResult) {
     let userId = call.argument("userId") as string;
-    ChatClient.getInstance().contactManager()?.getContactsFromLocal()
-      .then((value)=>{
-        let contact: Contact | undefined;
-        for (let index = 0; index < value.length; index++) {
-          const element = value[index];
-          if(element.userId() == userId) {
-            contact = element;
-            break;
-          }
-        }
-        if(contact != undefined) {
-          this.onSuccess(result, call.method, ContactHelper.toJson(contact));
+    ChatClient.getInstance().contactManager()?.getContact(userId)
+      .then((value)=> {
+        if(value != undefined) {
+          this.onSuccess(result, call.method, ContactHelper.toJson(value));
         }else {
           this.onSuccess(result, call.method);
         }
