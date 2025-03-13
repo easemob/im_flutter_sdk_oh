@@ -17,13 +17,16 @@ export default class FetchMessageOptionHelper {
     if(from != undefined) {
       ret.setFrom(from);
     }
-    let types = new Array<ContentType>();
-    let typeList = GetSafetyValue(json, "msgTypes") as Array<number>
-    for (let index = 0; index < typeList.length; index++) {
-      const element = typeList[index];
-      types.push(EnumTool.messageBodyTypeFromInt(element));
+    let typeList: Array<number> | undefined;
+    typeList = GetSafetyValue(json, "msgTypes");
+    if(typeList != undefined) {
+      let types = new Array<ContentType>();
+      for (let index = 0; index < typeList.length; index++) {
+        const element = typeList[index];
+        types.push(EnumTool.messageBodyTypeFromInt(element));
+      }
+      ret.setMsgTypes(types);
     }
-    ret.setMsgTypes(types);
     return ret;
   }
 }
