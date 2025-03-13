@@ -13,7 +13,10 @@ export default class FetchMessageOptionHelper {
     ret.setIsSave(GetSafetyValue(json, "needSave"));
     ret.setStartTime(GetSafetyValue(json, "startTs"));
     ret.setEndTime(GetSafetyValue(json, "endTs"));
-    ret.setFrom(GetSafetyValue(json, "from"));
+    let from : undefined | string = GetSafetyValue(json, "from");
+    if(from != undefined) {
+      ret.setFrom(from);
+    }
     let types = new Array<ContentType>();
     let typeList = GetSafetyValue(json, "msgTypes") as Array<number>
     for (let index = 0; index < typeList.length; index++) {
