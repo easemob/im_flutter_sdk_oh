@@ -10,7 +10,13 @@ export default class ConversationHelper {
     SafetyValue(conv.getType(), (value)=>ret.set("type", EnumTool.conversationTypeToInt(value)));
     SafetyValue(conv.getPinnedTime(), (value)=>ret.set("pinnedTime", value));
     SafetyValue(conv.isPinned(), (value)=>ret.set("isPinned", value));
-    SafetyValue(conv.marks(), (value)=> ret.set("marks", value));
+    SafetyValue(conv.marks(), (values)=> {
+      let list : Array<number> = new Array();
+      for (let value of values) {
+        list.push(value);
+      }
+      ret.set("marks", list);
+    });
     let str = conv.getExtField();
     if(str.length > 0) {
       SafetyValue(conv.getExtField(), (value)=> ret.set("ext", JSON.parse(value)));
