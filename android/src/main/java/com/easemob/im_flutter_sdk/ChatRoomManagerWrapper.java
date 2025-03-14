@@ -103,6 +103,8 @@ public class ChatRoomManagerWrapper extends Wrapper implements MethodChannel.Met
                 setChatRoomAttributes(param, call.method, result);
             } else if (MethodKey.removeChatRoomAttributes.equals(call.method)){
                 removeChatRoomAttributes(param, call.method, result);
+            } else if (MethodKey.isMemberInChatRoomMuteList.equals(call.method)){
+                isMemberInChatRoomMuteList(param, call.method, result);
             } else {
                 super.onMethodCall(call, result);
             }
@@ -912,5 +914,16 @@ public class ChatRoomManagerWrapper extends Wrapper implements MethodChannel.Met
     @Override
     public void unRegisterEaseListener() {
         EMClient.getInstance().chatroomManager().removeChatRoomListener(chatRoomChangeListener);
+    }
+
+    // 4.12.1
+    private void isMemberInChatRoomMuteList(JSONObject param, String channelName, MethodChannel.Result result) throws JSONException{
+        String groupId = param.getString("roomId");
+        EMClient.getInstance().chatroomManager().asyncCheckIfInMuteList(groupId, new EMValueWrapperCallBack<Boolean>(result, channelName) {
+            @Override
+            public void onSuccess(Boolean object) {
+                updateObject(object);
+            }
+        });
     }
 }

@@ -62,13 +62,12 @@ export default class ChatManagerWrapper extends Wrapper implements MethodCallHan
         retrievedObject?.channel?.invokeMethod(MethodKey.onMessagesReceived, MessageHelper.listToJson(messages));
       },
       onCmdMessageReceived(messages: ChatMessage[]){
-3
         let retrievedObject = weakRef.deref();
         retrievedObject?.channel?.invokeMethod(MethodKey.onCmdMessagesReceived, MessageHelper.listToJson(messages));
       },
       onMessageRead(messages: ChatMessage[]){
         let retrievedObject = weakRef.deref();
-        retrievedObject?.channel?.invokeMethod(MethodKey.onMessageReadAck, MessageHelper.listToJson(messages));
+        retrievedObject?.channel?.invokeMethod(MethodKey.onMessagesRead, MessageHelper.listToJson(messages));
       },
       onMessageRecalled(recallInfos: RecallMessageInfo[]){
         let retrievedObject = weakRef.deref();
@@ -416,7 +415,7 @@ export default class ChatManagerWrapper extends Wrapper implements MethodCallHan
     let msg = MessageHelper.fromJson(call.argument("message"));
     let dbMsg = ChatClient.getInstance().chatManager()?.getMessage(msg.getMsgId());
     if(!dbMsg) {
-      this.onSuccess(result, call.method, false);
+      this.onErrorInfo(result,500, "The message is invalid.");
       return;
     }
     HelpTool.mergeMessage(msg, dbMsg);
