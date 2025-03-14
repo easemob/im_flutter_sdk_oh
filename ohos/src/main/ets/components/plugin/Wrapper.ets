@@ -6,17 +6,7 @@ import {
 import { common } from "@kit.AbilityKit";
 import { ChatError } from "@easemob/chatsdk";
 import ChatErrorHelper from "./models/ChatErrorHelper";
-import taskPool from '@ohos.taskpool';
 
-
-@Concurrent
-function onSuccess(result: MethodResult, method: string, object?: Object | null): void {
-  let map = new Map<string, Object>();
-  if(object !== null && object !== undefined) {
-    map.set(method, object);
-  }
-  result.success(map);
-}
 
 
 export default class Wrapper implements  MethodCallHandler{
@@ -36,7 +26,6 @@ export default class Wrapper implements  MethodCallHandler{
   }
 
   public onSuccess(result: MethodResult, method: string, object?: Object | null): void {
-    // taskPool.execute(onSuccess, result, method, object);
     let map = new Map<string, Object>();
     if(object !== null && object !== undefined) {
       map.set(method, object);
@@ -48,10 +37,6 @@ export default class Wrapper implements  MethodCallHandler{
     let map = new Map<string, Object>();
     map.set("error", ChatErrorHelper.toJson(e));
     result.success(map);
-  }
-
-  public async asyncRunnable(func: Function) {
-    await taskPool.execute(func);
   }
 
   public onErrorInfo(result: MethodResult, code: number, desc: string) {
