@@ -82,6 +82,8 @@ export default class ChatRoomManagerWrapper extends Wrapper implements MethodCal
       this.setChatRoomAttributes(call, result);
     } else if (MethodKey.removeChatRoomAttributes == call.method) {
       this.removeChatRoomAttributes(call, result);
+    } else if (MethodKey.isMemberInChatRoomMuteList == call.method) {
+      this.isMemberInChatRoomMuteList(call, result);
     } else {
       super.onMethodCall(call, result);
     }
@@ -293,7 +295,7 @@ export default class ChatRoomManagerWrapper extends Wrapper implements MethodCal
       .then((value)=>this.onSuccess(result, call.method, value))
       .catch((e: ChatError) => this.onError(result, e));
   }
-  fetchChatRoomAttributes(call: MethodCall, result: MethodResult) {
+  private fetchChatRoomAttributes(call: MethodCall, result: MethodResult) {
     let roomId = call.argument("roomId") as string;
     let userId: string| undefined;
     if(call.hasArgument("userId")) {
@@ -305,7 +307,7 @@ export default class ChatRoomManagerWrapper extends Wrapper implements MethodCal
       .then((value)=>this.onSuccess(result, call.method, value))
       .catch((e: ChatError) => this.onError(result, e));
   }
-  setChatRoomAttributes(call: MethodCall, result: MethodResult) {
+  private setChatRoomAttributes(call: MethodCall, result: MethodResult) {
     ChatClient.getInstance().chatroomManager()?.setChatroomAttributes({
       chatroomId: GetSafetyValue(call.args, "roomId") ?? "",
       attributeKeyOrMap: ObjToMap(call.argument("attributes")),
@@ -316,7 +318,7 @@ export default class ChatRoomManagerWrapper extends Wrapper implements MethodCal
       .then(()=>this.onSuccess(result, call.method))
       .catch((e: ChatError) => this.onError(result, e));
   }
-  removeChatRoomAttributes(call: MethodCall, result: MethodResult) {
+  private removeChatRoomAttributes(call: MethodCall, result: MethodResult) {
     let roomId = call.argument("roomId") as string;
     let keys = call.argument("keys") as Array<string>;
     ChatClient.getInstance().chatroomManager()?.removeChatroomAttributes({
@@ -325,6 +327,13 @@ export default class ChatRoomManagerWrapper extends Wrapper implements MethodCal
       isForced: GetSafetyValue(call.args, "forced") ?? false
     })
       .then(()=>this.onSuccess(result, call.method))
+      .catch((e: ChatError) => this.onError(result, e));
+  }
+
+  private isMemberInChatRoomMuteList(call: MethodCall, result: MethodResult) {
+    let roomId = call.argument("roomId") as string;
+    ChatClient.getInstance().chatroomManager()?.checkIfInMutelist(roomId)
+      .then((value)=>this.onSuccess(result, call.method, value))
       .catch((e: ChatError) => this.onError(result, e));
   }
 

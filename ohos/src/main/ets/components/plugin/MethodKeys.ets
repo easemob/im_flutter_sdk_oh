@@ -365,4 +365,6 @@ export default class MethodKey {
 
   // shengwang
   static changeAppId = "changeAppId";
+
+  static isMemberInChatRoomMuteList = "isMemberInChatRoomMuteList";
 }
