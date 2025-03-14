@@ -367,4 +367,6 @@ public class MethodKey {
 
     // shengwang
     static final String changeAppId = "changeAppId";
+
+    static final String isMemberInChatRoomMuteList = "isMemberInChatRoomMuteList";
 }

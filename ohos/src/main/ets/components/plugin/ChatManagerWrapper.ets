@@ -415,7 +415,7 @@ export default class ChatManagerWrapper extends Wrapper implements MethodCallHan
     let msg = MessageHelper.fromJson(call.argument("message"));
     let dbMsg = ChatClient.getInstance().chatManager()?.getMessage(msg.getMsgId());
     if(!dbMsg) {
-      this.onSuccess(result, call.method, false);
+      this.onErrorInfo(result,500, "The message is invalid.");
       return;
     }
     HelpTool.mergeMessage(msg, dbMsg);

@@ -191,6 +191,9 @@
     else if ([ChatRemoveChatRoomAttributes isEqual: call.method]) {
         [self removeChatRoomAttributes:call.arguments channelName:call.method result:result];
     }
+    else if ([isMemberInChatRoomMuteList isEqual: call.method]) {
+        [self isMemberInChatRoomMuteList:call.arguments channelName:call.method result:result];
+    }
     else {
         [super handleMethodCall:call result:result];
     }
@@ -1009,7 +1012,17 @@
 
 
 
-#pragma mark - 481
+#pragma mark - 4.12.1
+- (void)isMemberInChatRoomMuteList:(NSDictionary *)param channelName:(NSString *)aChannelName result:(FlutterResult)result {
+    __weak typeof(self) weakSelf = self;
+    [EMClient.sharedClient.roomManager isMemberInMuteListFromServerWithChatroomId:param[@"roomId"]
+                                                                     completion:^(BOOL inMuteList, EMError * _Nullable aError) {
+        [weakSelf wrapperCallBack:result
+                      channelName:aChannelName
+                            error:aError
+                           object:@(inMuteList)];
+    }];
+}
 
 
 @end

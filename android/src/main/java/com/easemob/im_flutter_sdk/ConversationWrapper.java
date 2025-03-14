@@ -265,10 +265,8 @@ public class ConversationWrapper extends Wrapper implements MethodCallHandler{
         EMConversation conversation = conversationWithParam(params);
         EMMessage msg = MessageHelper.fromJson(params.getJSONObject("msg"));
         EMMessage dbMsg = EMClient.getInstance().chatManager().getMessage(msg.getMsgId());
-        if(!dbMsg) {
-            asyncRunnable(()->{
-                onSuccess(result, channelName, false);
-            });
+        if(dbMsg == null) {
+            onError(result, new HyphenateException(500, "The message is invalid."));
             return;
         }
         HelpTool.mergeMessage(msg, dbMsg);

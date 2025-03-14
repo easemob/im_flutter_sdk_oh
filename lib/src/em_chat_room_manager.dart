@@ -1498,4 +1498,16 @@ class EMChatRoomManager {
       throw e;
     }
   }
+
+  Future<bool> isMemberInChatRoomMuteList(String roomId) async {
+    Map req = {"roomId": roomId};
+    Map result = await _channel.invokeMethod(
+        ChatMethodKeys.isMemberInChatRoomMuteList, req);
+    try {
+      EMError.hasErrorFromResult(result);
+      return result.boolValue(ChatMethodKeys.isMemberInChatRoomMuteList);
+    } on EMError catch (e) {
+      throw e;
+    }
+  }
 }

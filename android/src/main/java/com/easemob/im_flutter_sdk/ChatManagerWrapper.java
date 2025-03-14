@@ -459,7 +459,7 @@ public class ChatManagerWrapper extends Wrapper implements MethodCallHandler {
         EMMessage msg = MessageHelper.fromJson(params.getJSONObject("message"));
         EMMessage dbMsg = EMClient.getInstance().chatManager().getMessage(msg.getMsgId());
         if(!dbMsg) {
-            onSuccess(result, channelName, false);
+            onError(result, new HyphenateException(500, "The message is invalid."));
             return;
         }
         HelpTool.mergeMessage(msg, dbMsg);

@@ -479,8 +479,14 @@
                    result:(FlutterResult)result {
     __weak typeof(self) weakSelf = self;
     EMChatMessage *msg = [EMChatMessage fromJson:param[@"message"]];
-    
     EMChatMessage *dbMsg = [EMClient.sharedClient.chatManager getMessageWithMessageId:msg.messageId];
+    if(dbMsg == nil) {
+        [weakSelf wrapperCallBack:result
+                      channelName:aChannelName
+                            error:[EMError errorWithDescription:@"The message is invalid." code:EMErrorMessageInvalid]
+                           object:nil];
+        return;
+    }
     [Helper mergeMessage:msg withDBMessage:dbMsg];
     [EMClient.sharedClient.chatManager updateMessage:dbMsg
                                           completion:^(EMChatMessage *aMessage, EMError *aError)
