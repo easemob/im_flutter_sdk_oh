@@ -887,7 +887,7 @@ public class GroupManagerWrapper extends Wrapper implements MethodCallHandler {
         EMClient.getInstance().groupManager().asyncFetchGroupMemberAllAttributes(groupId, userId, new EMValueWrapperCallBack<Map<String,Map<String,String>>>(result, channelName){
 
             @Override
-            public void onSuccess(Map<String, Map<String, String>> ) {
+            public void onSuccess(Map<String, Map<String, String>> object) {
                 updateObject(object);
             }
         });
