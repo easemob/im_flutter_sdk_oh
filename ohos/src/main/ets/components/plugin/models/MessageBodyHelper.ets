@@ -28,7 +28,7 @@ export default  class MessageBodyHelper {
 
   static textBodyFromJson(json: object): TextMessageBody {
     let content = GetSafetyValue(json, "content") as string;
-    // TODO: 不支持翻译
+    // TODO: 鸿蒙暂不支持翻译
     let ret = new TextMessageBody(content);
     return ret;
   }

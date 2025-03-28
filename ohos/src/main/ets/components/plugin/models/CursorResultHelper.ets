@@ -10,7 +10,6 @@ import GroupReadAckHelper from "./GroupReadAckHelper";
 import MessageHelper from "./MessageHelper";
 
 export default class CursorResultHelper {
-  // TODO: 补全类型
     static toJson<T>(result: CursorResult<T>):Map<string, Object> {
       let data = new Map<string, Object>();
       SafetyValue(result.getNextCursor(), (value)=>data.set("cursor", value));

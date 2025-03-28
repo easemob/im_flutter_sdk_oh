@@ -13,7 +13,6 @@ import {
 } from "@easemob/chatsdk";
 import { it } from "@ohos/hypium";
 
-// TODO: 待验证
 export default class EnumTool {
   static reactionOperationToInt(operation: ReactionOperation) : number{
     return operation;
@@ -59,10 +58,6 @@ export default class EnumTool {
 
   static groupPermissionTypeToInt(type: GroupPermissionType): number{
     return type;
-  }
-
-  static groupPermissionTypeFromInt(iType: number): GroupPermissionType {
-    return iType;
   }
 
   static searchDirectionToInt(direction: SearchDirection): number {

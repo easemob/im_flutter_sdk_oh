@@ -120,7 +120,6 @@ export default class MessageHelper {
         if(typeof v === "number" || typeof v === "string" || typeof v === "boolean") {
           ext.set(k, v);
         }else if(v instanceof Object){
-          // TODO: 待验证
           message?.setJsonAttribute(k, JSON.stringify(v));
         }
       }

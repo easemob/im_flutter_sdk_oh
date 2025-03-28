@@ -6,7 +6,6 @@ import GroupHelper from "./GroupHelper";
 import MessageHelper from "./MessageHelper";
 
 export default class PageResultHelper {
-  // TODO: 补全类型
   static toJson(result: Chatroom[]):Map<string, Object> {
     let data = new Map<string, Object>();
     let list = Array<Object>();

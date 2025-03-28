@@ -734,7 +734,7 @@ export default class ChatManagerWrapper extends Wrapper implements MethodCallHan
   private modifyMessage(call: MethodCall, result: MethodResult) {
     ChatClient.getInstance().chatManager()?.modifyMessage(
       GetSafetyValue(call.args, "msgId"),
-      MessageBodyHelper.textBodyFromJson(GetSafetyValue(call.args, "body")!),
+      MessageBodyHelper.textBodyFromJson(GetSafetyValue(call.args, "msgBody")!),
     )
       .then((value)=>this.onSuccess(result, call.method, MessageHelper.toJson(value)))
       .catch((e: ChatError) => this.onError(result, e));

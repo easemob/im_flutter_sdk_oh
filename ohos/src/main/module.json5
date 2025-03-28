@@ -1,6 +1,6 @@
 {
   "module": {
-    "name": "im_flutter_sdk",
+    "name": "im_flutter_sdk_ohos",
     "type": "har",
     "deviceTypes": [
       "default",

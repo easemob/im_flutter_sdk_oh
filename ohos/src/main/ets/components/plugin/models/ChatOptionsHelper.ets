@@ -48,6 +48,7 @@ export default class ChatOptionsHelper {
         options.setAppIDForPush(GetSafetyValue(map, ExtSettings.kAppIDForOhOS));
       }
     }
+  
 
     // TODO
     // options.setAppIDForPush(param.get("dnsUrl") as string);
