@@ -383,7 +383,7 @@ export default class GroupManagerWrapper extends Wrapper implements MethodCallHa
   private getJoinedGroupsFromServer(call: MethodCall, result: MethodResult) {
     let pageSize = call.argument("pageSize") as number;
     let pageNum = call.argument("pageNum") as number;
-    ChatClient.getInstance().groupManager()?.fetchJoinedGroupsFromServer(pageSize, pageNum)
+    ChatClient.getInstance().groupManager()?.fetchJoinedGroupsFromServer(pageNum, pageSize)
       .then((groups)=>{
         this.onSuccess(result, call.method, GroupHelper.listToJson(groups));
       })
