@@ -6,7 +6,7 @@
   "author": "",
   "license": "",
   "dependencies": {
-    "im_flutter_sdk": "file:../har/im_flutter_sdk.har",
+    "im_flutter_sdk": "file:../../../ohos",
     "@ohos/flutter_ohos": "har/flutter.har"
   }
 }
